@@ -35,6 +35,7 @@ using namespace System::Collections::Generic;
 using namespace System;
 using namespace System::Runtime::InteropServices;
 using namespace System::IO;
+using namespace System::Threading;
 
 namespace Zamboch
 {
@@ -77,81 +78,97 @@ namespace Zamboch
 
 			void FastShape::Load()
 			{
-				if (isLoaded)
-					return;
-
-				Database::OnLoadShape(this);
-				Console::WriteLine("Loading shape {0:00}", ShapeIndex);
-
-
-				String^ dir=System::IO::Path::GetDirectoryName(FileName);
-				if (!Directory::Exists(dir))
-				{
-					Directory::CreateDirectory(dir);
-				}
-
-				IntPtr fileName=Marshal::StringToHGlobalUni(FileName);
 				try
 				{
-					//SYSTEM_INFO i;
-					//GetSystemInfo(&i);
+					Monitor::Enter(this);
+					if (isLoaded)
+						return;
 
-					fileHandle = CreateFile((LPCWSTR)fileName.ToPointer(),
-						GENERIC_READ|GENERIC_WRITE, 
-						FILE_SHARE_READ /*| FILE_SHARE_WRITE*/, 
-						NULL, OPEN_ALWAYS, 
-						FILE_FLAG_RANDOM_ACCESS, NULL);
-					if (fileHandle == INVALID_HANDLE_VALUE)
-						throw gcnew System::IO::IOException();
+					Database::OnLoadShape(this);
+					Console::WriteLine("Loading shape {0:00}", ShapeIndex);
 
-					//prevent fragmentation
-					SetFilePointer(fileHandle, PageSize*SmallPermCount, 0, FILE_BEGIN);
-					SetEndOfFile(fileHandle);
 
-					mappingHandle = CreateFileMapping(fileHandle, NULL, PAGE_READWRITE, 0, PageSize*SmallPermCount, NULL);
-					if (mappingHandle == NULL)
-						throw gcnew System::IO::IOException();
-					
-					dataPtr = (byte*)MapViewOfFile(mappingHandle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, PageSize*SmallPermCount);
-					if (dataPtr == NULL)
+					String^ dir=System::IO::Path::GetDirectoryName(FileName);
+					if (!Directory::Exists(dir))
 					{
-						DWORD e=GetLastError();
-						throw gcnew System::IO::IOException();
+						Directory::CreateDirectory(dir);
 					}
 
-					//data = (IntPtr)dataPtr;
-					isLoaded=true;
-					for(int p=0;p<Pages->Count;p++)
+					IntPtr fileName=Marshal::StringToHGlobalUni(FileName);
+					try
 					{
-						FastPage^ fp=dynamic_cast<FastPage^>(Pages[p]);
-						fp->UpdatePointer();
+						//SYSTEM_INFO i;
+						//GetSystemInfo(&i);
+
+						fileHandle = CreateFile((LPCWSTR)fileName.ToPointer(),
+							GENERIC_READ|GENERIC_WRITE, 
+							FILE_SHARE_READ /*| FILE_SHARE_WRITE*/, 
+							NULL, OPEN_ALWAYS, 
+							FILE_FLAG_RANDOM_ACCESS, NULL);
+						if (fileHandle == INVALID_HANDLE_VALUE)
+							throw gcnew System::IO::IOException();
+
+						//prevent fragmentation
+						SetFilePointer(fileHandle, PageSize*SmallPermCount, 0, FILE_BEGIN);
+						SetEndOfFile(fileHandle);
+
+						mappingHandle = CreateFileMapping(fileHandle, NULL, PAGE_READWRITE, 0, PageSize*SmallPermCount, NULL);
+						if (mappingHandle == NULL)
+							throw gcnew System::IO::IOException();
+						
+						dataPtr = (byte*)MapViewOfFile(mappingHandle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, PageSize*SmallPermCount);
+						if (dataPtr == NULL)
+						{
+							DWORD e=GetLastError();
+							throw gcnew System::IO::IOException();
+						}
+
+						//data = (IntPtr)dataPtr;
+						isLoaded=true;
+						for(int p=0;p<Pages->Count;p++)
+						{
+							FastPage^ fp=dynamic_cast<FastPage^>(Pages[p]);
+							fp->UpdatePointer();
+						}
+					}
+					finally
+					{
+						Marshal::FreeHGlobal(fileName);
 					}
 				}
 				finally
 				{
-					Marshal::FreeHGlobal(fileName);
+					Monitor::Exit(this);
 				}
 			}
 
 			void FastShape::Close()
 			{
-				if (isLoaded)
+				try
 				{
-					Console::WriteLine("Closing shape {0:00}", ShapeIndex);
-					BOOL res;
-					isLoaded=false;
+					Monitor::Enter(this);
+					if (isLoaded)
+					{
+						Console::WriteLine("Closing shape {0:00}", ShapeIndex);
+						BOOL res;
+						isLoaded=false;
 
-					res=UnmapViewOfFile(dataPtr);
-					if (!res)
-						throw gcnew System::IO::IOException();
+						res=UnmapViewOfFile(dataPtr);
+						if (!res)
+							throw gcnew System::IO::IOException();
 
-					res=CloseHandle(mappingHandle);
-					if (!res)
-						throw gcnew System::IO::IOException();
+						res=CloseHandle(mappingHandle);
+						if (!res)
+							throw gcnew System::IO::IOException();
 
-					res=CloseHandle(fileHandle);
-					if (!res)
-						throw gcnew System::IO::IOException();
+						res=CloseHandle(fileHandle);
+						if (!res)
+							throw gcnew System::IO::IOException();
+					}
+				}
+				finally
+				{
+					Monitor::Exit(this);
 				}
 			}
 

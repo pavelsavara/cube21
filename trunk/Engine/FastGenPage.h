@@ -35,11 +35,11 @@ namespace Zamboch
 				{
 				}
 
-				virtual void ExpandCubes(NormalShape^ targetShape, int sourceLevel, Page^ sourcePage) override
+				virtual void ExpandCubes(NormalShape^ targetShape, int sourceLevel) override
 				{
-					ExpandPage(targetShape, sourceLevel, sourcePage);
+					ExpandPage(targetShape, sourceLevel);
 				}
-				void ExpandPage(NormalShape^ targetShape, int sourceLevel, Page^ sourcePage);
+				void ExpandPage(NormalShape^ targetShape, int sourceLevel);
 			};
 		}
 	}

@@ -30,13 +30,6 @@ namespace Zamboch
 			public:
 				FastShape();
 				~FastShape();
-				virtual property String^ FileName
-				{
-					virtual String^ get()
-					{
-		                return "Cube\\Shape" + ShapeIndex.ToString("00") + ".data";
-					}
-				}
 
 				virtual void Load() override;
 				virtual void Close() override;

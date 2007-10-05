@@ -8,12 +8,14 @@ namespace Zamboch.Cube21.Work
     {
         #region Data
 
+        [XmlAttribute]
         public int SourceShapeIndex;
+        [XmlAttribute]
         public int TargetShapeIndex;
+        [XmlAttribute]
         public int SumOfWork = 1;
 
-        [XmlIgnore]
-        public List<WorkItem> Work;
+        public List<WorkItem> Work=new List<WorkItem>();
 
         #endregion
 
@@ -32,6 +34,63 @@ namespace Zamboch.Cube21.Work
         #endregion
 
         #region Public methods
+
+        public bool DoWork()
+        {
+            Queue<WorkItem> queue;
+            lock(this)
+            {
+                queue = new Queue<WorkItem>(Work);
+            }
+            while (queue.Count > 0)
+            {
+                WorkItem workItem = queue.Dequeue();
+                workItem.DoWork();
+                if (Console.KeyAvailable)
+                {
+                    Work=new List<WorkItem>(queue);
+                    return false;
+                }
+            }
+            lock (this)
+            {
+                Work.Clear();
+            }
+            return true;
+        }
+        
+        public void PrefetchNext()
+        {
+            NormalShape sourceShape = Database.GetShape(SourceShapeIndex);
+            NormalShape targetShape = Database.GetShape(TargetShapeIndex);
+
+            sourceShape.Load();
+            targetShape.Load();
+
+            List<WorkItem> copy;
+            lock(this)
+            {
+                copy=new List<WorkItem>(Work);
+            }
+            foreach (WorkItem item in copy)
+            {
+                Page sourcePage = sourceShape.GetPage(item.SourcePageSmallIndex);
+                byte d = sourcePage.Touch();
+                Console.WriteLine("Touch SourceShape {0:00}, SourcePage {1:0000} {2:XX}",
+                                  SourceShapeIndex, item.SourcePageSmallIndex, d);
+            }
+            List<Page> copyPages;
+            lock(targetShape)
+            {
+                copyPages = new List<Page>(targetShape.Pages);
+            }
+            foreach (Page targetPage in copyPages)
+            {
+                Console.WriteLine("Touch TargetShape {0:00}, TargetPage {1:0000}",
+                                  TargetShapeIndex, targetPage.SmallIndex);
+                targetPage.Touch();
+            }
+        }
 
         [XmlIgnore]
         public int ID
