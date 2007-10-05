@@ -49,6 +49,7 @@ namespace Zamboch.Cube21.Work
 
             foreach (NormalShape tgShape in Database.NormalShapes)
             {
+                tgShape.Pages.Sort();
                 foreach (Page page in tgShape.Pages)
                 {
                     int work = page.LevelCounts[sourceLevel];

@@ -76,7 +76,7 @@ namespace Zamboch.Cube21.Work
             {
                 Page sourcePage = sourceShape.GetPage(item.SourcePageSmallIndex);
                 byte d = sourcePage.Touch();
-                Console.WriteLine("Touch SourceShape {0:00}, SourcePage {1:0000} {2:XX}",
+                Console.WriteLine("Touch SourceShape {0:00}, SourcePage {1:0000} {2:000}",
                                   SourceShapeIndex, item.SourcePageSmallIndex, d);
             }
             List<Page> copyPages;
@@ -86,9 +86,9 @@ namespace Zamboch.Cube21.Work
             }
             foreach (Page targetPage in copyPages)
             {
-                Console.WriteLine("Touch TargetShape {0:00}, TargetPage {1:0000}",
-                                  TargetShapeIndex, targetPage.SmallIndex);
-                targetPage.Touch();
+                byte d=targetPage.Touch();
+                Console.WriteLine("Touch TargetShape {0:00}, TargetPage {1:0000} {2:000}",
+                                  TargetShapeIndex, targetPage.SmallIndex, d);
             }
         }
 
