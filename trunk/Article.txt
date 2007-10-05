@@ -1,0 +1,19 @@
+(Back to) Square One / Cube 21
+  - silver cube, 
+   - Jaap http://www.geocities.com/jaapsch/puzzles/square1.htm
+   - Mike Masonjones, God's, http://www.geocities.com/jaapsch/puzzles/square1t.htm
+   - Fred Curtis http://f2.org/maths/square1/
+  - shapes, different kinds of moves
+  - cube model as permutation with repetitions
+Algorithmization
+  - Naive: remember all existing permutations, search them
+  - Doable: index of permutation, way back to white cube
+  - Only unique: normal shape, minimal cube, same results
+  - Better: shapes, bib and small pieces, pages, tables of permutations
+  - Paging: memory mapped file, fragmentation, half byte
+  - Generating: fast code, rotate bits, CLR boundary
+  - Disk crunching: orded work, prevent swaping, windows vista
+  - Multi thread
+  - Prefetch
+  - Test
+  - Client
