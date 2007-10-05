@@ -37,7 +37,7 @@ namespace Zamboch.Cube21
         [XmlIgnore]
         public NormalShape Shape;
 
-        public int[] LevelCounts = new int[13];
+        public int[] LevelCounts = new int[14];
 
         #endregion
 
