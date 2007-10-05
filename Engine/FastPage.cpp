@@ -36,7 +36,6 @@ namespace Zamboch
 				return true;
 			}
 
-
 		    int lGetNextAddress(byte* dataPtr, int address, int level)
 			{
 				//TODO optimize
@@ -71,6 +70,17 @@ namespace Zamboch
 					cntpages[smallIndex]++;
 				}
 			}
+
+			byte lTouch(int smallIndex, int targetShapeIndex)
+			{
+				byte* dtpages[SmallPermCount];
+				memset(dtpages, 0,4*SmallPermCount);
+
+				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
+				byte d=dtpage[0] + dtpage[PageSize-1];
+				return d;
+			}
+
 			#pragma endregion
 		}
 	}
@@ -112,6 +122,12 @@ namespace Zamboch
 			{
 				dataPtr=dynamic_cast<FastShape^>(Shape)->dataPtr + PageSize*SmallIndex;
 			}
+
+			byte FastPage::Touch()
+			{
+				return lTouch(SmallIndex, ShapeIndex);
+			}
+
 		}
 	}
 }

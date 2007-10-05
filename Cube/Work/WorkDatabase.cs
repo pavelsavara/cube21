@@ -11,6 +11,7 @@ namespace Zamboch.Cube21.Work
 
         public static void OnLoadShapeImpl(NormalShape shape)
         {
+            NormalShape oldShape = null;
             timeStamp++;
             shape.LastTouch = timeStamp;
             if (!shape.IsLoaded)
@@ -18,7 +19,7 @@ namespace Zamboch.Cube21.Work
                 if (loadedShapes.Count > maxShapesLoaded)
                 {
                     long mintime = long.MaxValue;
-                    NormalShape oldShape = loadedShapes[0];
+                    oldShape = loadedShapes[0];
                     foreach (NormalShape loadedShape in loadedShapes)
                     {
                         if (loadedShape.LastTouch < mintime)
@@ -27,18 +28,19 @@ namespace Zamboch.Cube21.Work
                             mintime = loadedShape.LastTouch;
                         }
                     }
-                    oldShape.Close();
                     loadedShapes.Remove(oldShape);
                 }
                 loadedShapes.Add(shape);
             }
+            if (oldShape!=null)
+                oldShape.Close();
         }
 
         #endregion
 
         #region Shapes order
 
-        public static List<WorkItem> PrepareNextLevel(int sourceLevel)
+        public static List<ShapePair> PrepareNextLevel(int sourceLevel)
         {
             List<WorkItem> nextLevel = new List<WorkItem>();
             Dictionary<int, WorkItem> hash = new Dictionary<int, WorkItem>();
@@ -80,23 +82,14 @@ namespace Zamboch.Cube21.Work
             }
             List<ShapePair> pairs = new List<ShapePair>(shapePairs.Values);
             pairs.Sort();
-            nextLevel.Sort();
-
             ReorderPairs(pairs);
-            List<WorkItem> res = new List<WorkItem>();
+
             foreach (ShapePair pair in pairs)
             {
-                foreach (WorkItem item in nextLevel)
-                {
-                    if (item.SourceShapeIndex == pair.SourceShapeIndex && item.TargetShapeIndex == pair.TargetShapeIndex
-                        )
-                    {
-                        res.Add(item);
-                    }
-                }
+                pair.Work.Sort();
             }
 
-            return res;
+            return pairs;
         }
 
         private const int maxShapesLoaded = 20; //TODO

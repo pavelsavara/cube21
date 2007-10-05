@@ -1,4 +1,5 @@
 using System;
+using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Work
 {
@@ -6,9 +7,13 @@ namespace Zamboch.Cube21.Work
     {
         #region Data
 
+        [XmlAttribute]
         public int SourceShapeIndex;
+        [XmlAttribute]
         public int SourcePageSmallIndex;
+        [XmlAttribute]
         public int TargetShapeIndex;
+        [XmlAttribute]
         public int SourceLevel;
 
         #endregion
@@ -31,7 +36,7 @@ namespace Zamboch.Cube21.Work
 
         #region Public methods
 
-        public void DoWork(int position, int total)
+        public bool DoWork()
         {
             NormalShape sourceShape = Database.GetShape(SourceShapeIndex);
             NormalShape targetShape = Database.GetShape(TargetShapeIndex);
@@ -39,19 +44,18 @@ namespace Zamboch.Cube21.Work
 
             string time = DateTime.Now.ToLongTimeString();
             int count = sourcePage.LevelCounts[SourceLevel];
-            Console.WriteLine("{6} ({4:00}%) Level {0}, TargetShape {2:00}, SourceShape {1:00}, SourcePage {3:0000}({5:00000})",
+            Console.WriteLine("{5} Level {0}, TargetShape {2:00}, SourceShape {1:00}, SourcePage {3:0000}({4:00000})",
                               SourceLevel, SourceShapeIndex, TargetShapeIndex, SourcePageSmallIndex,
-                              (position * 100) / total, count, time);
+                              count, time);
 
+            sourceShape.Load();
+            targetShape.Load();
 
-            if (!sourceShape.IsLoaded)
-                sourceShape.Load();
-            if (!targetShape.IsLoaded)
-                targetShape.Load();
-
-            sourcePage.ExpandCubes(targetShape, SourceLevel, sourcePage);
+            sourcePage.ExpandCubes(targetShape, SourceLevel);
+            
+            return true;
         }
-
+        
         #endregion
 
         #region Extensions

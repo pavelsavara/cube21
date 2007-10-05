@@ -42,6 +42,7 @@ namespace Zamboch
 				virtual bool Write(int address, int level) override;
 		        virtual int GetNextAddress(int lastAddress, int level) override;
 				virtual void UpdatePointer() override;
+				virtual byte Touch() override;
 
 				[System::Xml::Serialization::XmlIgnoreAttribute]
 				byte* dataPtr;

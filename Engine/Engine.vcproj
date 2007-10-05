@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			ManagedExtensions="1"
 			>
@@ -62,6 +62,7 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -192,7 +193,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{7AC8039F-9CD8-4E2A-BCFC-E9373B8981B3}"
-			RelativePathToProject=".\Core\Core.csproj"
+			RelativePathToProject=".\Cube\Cube.csproj"
 		/>
 		<AssemblyReference
 			RelativePath="System.Drawing.dll"

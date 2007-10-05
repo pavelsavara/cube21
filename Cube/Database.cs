@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Work;
 using Path=System.IO.Path;
+using System.Threading;
 
 namespace Zamboch.Cube21
 {
@@ -44,7 +45,7 @@ namespace Zamboch.Cube21
             WorkDatabase.OnLoadShapeImpl(shape);
         }
 
-        public static List<WorkItem> PrepareNextLevel()
+        public static List<ShapePair> PrepareNextLevel()
         {
             return WorkDatabase.PrepareNextLevel(instance.SourceLevel);
         }
@@ -68,15 +69,18 @@ namespace Zamboch.Cube21
         public static Page GetPage(int smallIndex, NormalShape shape)
         {
             Page page;
-            if (!shape.SmallIndexToPages.ContainsKey(smallIndex))
+            lock (shape)
             {
-                page = instance.CreatePageImpl(smallIndex, shape);
-                shape.Pages.Add(page);
-                shape.SmallIndexToPages.Add(smallIndex, page);
-            }
-            else
-            {
-                page = shape.SmallIndexToPages[smallIndex];
+                if (!shape.SmallIndexToPages.ContainsKey(smallIndex))
+                {
+                    page = instance.CreatePageImpl(smallIndex, shape);
+                    shape.Pages.Add(page);
+                    shape.SmallIndexToPages.Add(smallIndex, page);
+                }
+                else
+                {
+                    page = shape.SmallIndexToPages[smallIndex];
+                }
             }
             return page;
         }
@@ -348,7 +352,6 @@ namespace Zamboch.Cube21
 
         public virtual bool CreateDatabaseImpl()
         {
-            bool quit = false;
             while (true)
             {
                 if (thisLevel.Count == 0)
@@ -356,39 +359,7 @@ namespace Zamboch.Cube21
                     break;
                 }
 
-                Queue<WorkItem> queue = new Queue<WorkItem>(thisLevel);
-                try
-                {
-                    while (queue.Count > 0)
-                    {
-                        WorkItem work = queue.Dequeue();
-
-                        work.DoWork(queue.Count, thisLevel.Count);
-
-                        if (Console.KeyAvailable)
-                        {
-                            quit = true;
-                            break;
-                        }
-                    }
-                    if (!quit)
-                    {
-                        Console.WriteLine("Next level!");
-                    }
-                }
-                finally
-                {
-                    thisLevel = new List<WorkItem>(queue);
-                    Save();
-                    foreach (NormalShape shape in normalShapes)
-                    {
-                        if (shape.IsLoaded)
-                        {
-                            shape.Close();
-                        }
-                    }
-                }
-                if (quit)
+                if (DoLevel())
                 {
                     return false;
                 }
@@ -398,6 +369,58 @@ namespace Zamboch.Cube21
                 GC.Collect();
             }
             return true;
+        }
+        
+        private static void PrefetchNext(Object data)
+        {
+            ShapePair next = (ShapePair)data;
+            next.PrefetchNext();
+        }
+
+        private bool DoLevel()
+        {
+            Queue<ShapePair> queue;
+            ShapePair work;
+            bool quit=false;
+            queue = new Queue<ShapePair>(thisLevel);
+            try
+            {
+                while (queue.Count > 0)
+                {
+                    work = queue.Dequeue();
+                    if (queue.Count > 0)
+                    {
+                        ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(PrefetchNext), queue.Peek());
+                    }
+
+                    int percent = (queue.Count * 100) / thisLevel.Count;
+                    Console.Write("({0:00}%)", percent);
+                    work.DoWork();
+
+                    if (Console.KeyAvailable)
+                    {
+                        quit = true;
+                        break;
+                    }
+                }
+                if (!quit)
+                {
+                    Console.WriteLine("Next level!");
+                }
+            }
+            finally
+            {
+                thisLevel = new List<ShapePair>(queue);
+                Save();
+                foreach (NormalShape shape in normalShapes)
+                {
+                    if (shape.IsLoaded)
+                    {
+                        shape.Close();
+                    }
+                }
+            }
+            return quit;
         }
 
         #endregion
@@ -496,7 +519,7 @@ namespace Zamboch.Cube21
         public int SourceLevel = 0;
 
         public List<NormalShape> normalShapes = new List<NormalShape>();
-        public List<WorkItem> thisLevel = new List<WorkItem>();
+        public List<ShapePair> thisLevel = new List<ShapePair>();
 
         protected Dictionary<uint, Shape> shapeNormalizer = new Dictionary<uint, Shape>();
         protected Dictionary<int, Shape> shapeIndexes = new Dictionary<int, Shape>();

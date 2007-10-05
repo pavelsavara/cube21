@@ -67,6 +67,14 @@ namespace Zamboch.Cube21
             get { return false; }
         }
 
+		public virtual String FileName
+		{
+			get
+			{
+                return "Cube\\Shape" + ShapeIndex.ToString("00") + ".data";
+			}
+		}
+        
         #endregion
 
         #region Abstract
