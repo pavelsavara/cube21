@@ -260,14 +260,11 @@ namespace Zamboch
         {
             tw.Write(
                 @"
-            void FastGenPage::ExpandPage(NormalShape^ targetShape, int sourceLevel, Page^ sourcePage)");
+            void FastGenPage::ExpandPage(int sourceLevel, int sourceSmallIndex, int targetShapeIndex, byte* dataPtr, int* cntpages)");
             tw.Write(
                 @"
             {
-				int cntpages[SmallPermCount];
-				memset(cntpages, 0,4*SmallPermCount);
-                int targetShapeIndex = targetShape->ShapeIndex;
-                int sourceSmallIndex = sourcePage->SmallIndex;
+				int targetShapeIndex = targetShape->ShapeIndex;
 
                 switch(ShapeIndex)
                 {");
@@ -298,15 +295,6 @@ namespace Zamboch
             tw.Write(
                 @"
                 }
-				int tgLevel=sourceLevel+1;
-				for(int i=0;i<SmallPermCount;i++)
-				{
-					if (cntpages[i]>0)
-					{
-						FastPage^ p=dynamic_cast<FastPage^>(targetShape->GetPage(i));
-						p->LevelCounts[tgLevel]+=cntpages[i];
-					}
-				}
             }");
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Work
@@ -34,6 +35,19 @@ namespace Zamboch.Cube21.Work
         #endregion
 
         #region Public methods
+
+        public void StartWork(ManualResetEvent finalSignal)
+        {
+            ThreadPool.UnsafeQueueUserWorkItem(DoWork, finalSignal);
+            
+        }
+
+        public void DoWork(object ofinalSignal)
+        {
+            ManualResetEvent finalSignal = (ManualResetEvent)ofinalSignal;
+            DoWork();
+            finalSignal.Set();
+        }
 
         public bool DoWork()
         {
