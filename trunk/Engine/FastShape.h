@@ -31,14 +31,23 @@ namespace Zamboch
 				FastShape();
 				~FastShape();
 
-				virtual void Load() override;
-				virtual void Close() override;
+				virtual bool Load() override;
+				virtual void Release() override;
+				virtual bool Close() override;
 
 				virtual property bool IsLoaded
 				{
 					virtual bool get() override
 					{
 						return isLoaded;
+					}
+				}
+
+				virtual property bool IsUsed
+				{
+					virtual bool get() override
+					{
+						return loadedCount>0;
 					}
 				}
 
@@ -52,8 +61,15 @@ namespace Zamboch
 				byte* dataPtr;
 
 				[System::Xml::Serialization::XmlIgnoreAttribute]
+				int loadedCount;
+				[System::Xml::Serialization::XmlIgnoreAttribute]
 				bool isLoaded;
 			private:
+				static List<NormalShape^>^ loadedShapes;
+				static long timeStamp = 1;
+				void LoadInternal();
+				void CloseInternal();
+				void KickOld();
 				static FastShape();
 			};
 		}

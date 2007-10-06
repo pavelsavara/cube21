@@ -44,14 +44,19 @@ namespace Zamboch.Cube21.Work
 
             string time = DateTime.Now.ToLongTimeString();
             int count = sourcePage.LevelCounts[SourceLevel];
+            /*
             Console.WriteLine("{5} Level {0}, TargetShape {2:00}, SourceShape {1:00}, SourcePage {3:0000}({4:00000})",
                               SourceLevel, SourceShapeIndex, TargetShapeIndex, SourcePageSmallIndex,
                               count, time);
+             */
 
             sourceShape.Load();
             targetShape.Load();
 
             sourcePage.ExpandCubes(targetShape, SourceLevel);
+
+            targetShape.Release();
+            sourceShape.Release();
             
             return true;
         }

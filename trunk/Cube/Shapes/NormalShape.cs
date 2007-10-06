@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using Zamboch.Cube21.Actions;
+using Zamboch.Cube21.Work;
 
 namespace Zamboch.Cube21
 {
@@ -62,11 +63,6 @@ namespace Zamboch.Cube21
             get { return true; }
         }
 
-        public virtual bool IsLoaded
-        {
-            get { return false; }
-        }
-
 		public virtual String FileName
 		{
 			get
@@ -77,16 +73,33 @@ namespace Zamboch.Cube21
         
         #endregion
 
-        #region Abstract
+        #region Abstract loaders
 
-        public virtual void Load()
+        public virtual bool IsLoaded
+        {
+            get { return false; }
+        }
+
+        public virtual bool IsUsed
+        {
+            get { return false; }
+        }
+
+        public virtual bool Load()
+        {
+            //void implementation
+            return false;
+        }
+
+        public virtual void Release()
         {
             //void implementation
         }
 
-        public virtual void Close()
+        public virtual bool Close()
         {
             //void implementation
+            return false;
         }
 
         #endregion
