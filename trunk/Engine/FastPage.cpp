@@ -13,6 +13,7 @@ namespace Zamboch
 			#pragma region Page operations
 			bool lWrite(byte* dataPtr, int address, int level)
 			{
+				//no need to synchronize, all workers will write same level, in case of colision
 				bool hi=((address&0x1) == 0x1);
 				address>>=1;
 				byte d=dataPtr[address];

@@ -6,12 +6,22 @@ namespace Zamboch.Cube21.Work
     {
         #region Shapes order
 
-        public static List<ShapePair> PrepareNextLevel(int sourceLevel)
+        public static List<ShapePair> PrepareNextLevel(int sourceLevel, out long levelCount)
         {
             List<WorkItem> nextLevel = new List<WorkItem>();
             Dictionary<int, WorkItem> hash = new Dictionary<int, WorkItem>();
             Dictionary<int, ShapePair> shapePairs = new Dictionary<int, ShapePair>();
 
+            levelCount = 0;
+            foreach (NormalShape shape in Database.NormalShapes)
+            {
+                shape.LevelCounts[sourceLevel] = 0;
+                foreach (Page page in shape.Pages)
+                {
+                    shape.LevelCounts[sourceLevel] += page.LevelCounts[sourceLevel];
+                }
+                levelCount += shape.LevelCounts[sourceLevel];
+            }
 
             foreach (NormalShape tgShape in Database.NormalShapes)
             {

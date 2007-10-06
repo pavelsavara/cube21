@@ -35,6 +35,8 @@ namespace Zamboch.Cube21
         public List<SmartStep> NextSteps = new List<SmartStep>();
         public List<int> AllTargetShapeIndexes = new List<int>();
 
+        public long[] LevelCounts = new long[15];
+
         #endregion
 
         #region Properties

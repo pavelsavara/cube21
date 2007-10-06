@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Xml.Serialization;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Work;
 using Path=System.IO.Path;
-using System.Threading;
 
 namespace Zamboch.Cube21
 {
@@ -40,9 +40,9 @@ namespace Zamboch.Cube21
             return new Page(smallIndex, shape);
         }
 
-        public static List<ShapePair> PrepareNextLevel()
+        public static List<ShapePair> PrepareNextLevel(out long levelCount)
         {
-            return WorkDatabase.PrepareNextLevel(instance.SourceLevel);
+            return WorkDatabase.PrepareNextLevel(instance.SourceLevel, out levelCount);
         }
 
         public static void RegisterShape(Shape shape)
@@ -131,7 +131,7 @@ namespace Zamboch.Cube21
             whiteShape.Release();
             whiteShape.Close();
 
-            instance.thisLevel = PrepareNextLevel();
+            instance.ThisLevelWork = PrepareNextLevel(out instance.LevelCounts[instance.SourceLevel]);
             Save();
         }
 
@@ -350,7 +350,7 @@ namespace Zamboch.Cube21
         {
             while (true)
             {
-                if (thisLevel.Count == 0)
+                if (ThisLevelWork.Count == 0)
                 {
                     break;
                 }
@@ -359,103 +359,63 @@ namespace Zamboch.Cube21
                 {
                     return false;
                 }
+                TimeEnd[SourceLevel] = DateTime.Now;
+                Console.WriteLine("Next level!");
                 SourceLevel++;
-                thisLevel = PrepareNextLevel();
+
+                ThisLevelWork = PrepareNextLevel(out LevelCounts[SourceLevel]);
                 Save();
                 GC.Collect();
+
+                TimeStart[SourceLevel] = DateTime.Now;
             }
             return true;
         }
 
-        //private AutoResetEvent signal = new AutoResetEvent(false);
-
-        private void PrefetchNext(Object data)
+        public bool DoLevel()
         {
-            ShapePair next = (ShapePair)data;
-            next.PrefetchNext();
-            //signal.Set();
-        }
+            int workersCount = Environment.ProcessorCount + 1;
+            ManualResetEvent[] results = new ManualResetEvent[workersCount];
+            Queue<ShapePair> queue = new Queue<ShapePair>(ThisLevelWork);
 
-        private void DoWork(Object data)
-        {
-            ShapePair work = (ShapePair)data;
-            work.DoWork();
-        }
-
-        private void BeginFetch(Queue<ShapePair> prequeue)
-        {
-            if (prequeue.Count > 0)
+            for (int w = 0; w < workersCount; w++)
             {
-                ThreadPool.UnsafeQueueUserWorkItem(PrefetchNext, prequeue.Dequeue());
-            }
-        }
-
-        private void BeginWork(Queue<ShapePair> queue)
-        {
-            if (queue.Count > 0)
-            {
-                ThreadPool.UnsafeQueueUserWorkItem(DoWork, queue.Dequeue());
-            }
-        }
-
-        private bool DoLevel()
-        {
-            Queue<ShapePair> queue;
-            Queue<ShapePair> prequeue;
-            ShapePair work;
-            bool quit=false;
-            queue = new Queue<ShapePair>(thisLevel);
-            prequeue = new Queue<ShapePair>(thisLevel);
-            try
-            {
-                // preLoaded ahead
-                Console.WriteLine("Start");
-                for (int p = 0; p < WorkDatabase.preLoaded;p++ )
+                ManualResetEvent resSignal = new ManualResetEvent(true);
+                results[w] = resSignal;
+                if (queue.Count > 0)
                 {
-                    //BeginFetch(prequeue);
+                    resSignal.Reset();
+                    ShapePair work = queue.Dequeue();
+                    work.StartWork(resSignal);
                 }
+            }
 
-                while (queue.Count > 0)
+            while (true)
+            {
+                int w = WaitHandle.WaitAny(results);
+                if (Console.KeyAvailable)
                 {
-                    work = queue.Dequeue();
-                    //BeginFetch(prequeue);
-                    //BeginFetch(prequeue);
-
-                    BeginWork(queue);
-
-                    int percent = 100 - ((queue.Count * 100) / thisLevel.Count);
+                    ThisLevelWork = new List<ShapePair>(queue);
+                    WaitHandle.WaitAll(results);
+                    return true;
+                }
+                if (queue.Count > 0)
+                {
+                    int percent = 100 - ((queue.Count * 100) / ThisLevelWork.Count);
                     Console.WriteLine("({0:00}%) Level {1}", percent, SourceLevel);
-                    work.DoWork();
 
-                    /*if (queue.Count > 0)
-                    {
-                        signal.WaitOne();
-                    }*/
-
-                    if (Console.KeyAvailable)
-                    {
-                        quit = true;
-                        break;
-                    }
-                }
-                if (!quit)
-                {
-                    Console.WriteLine("Next level!");
+                    ManualResetEvent resSignal = results[w];
+                    resSignal.Reset();
+                    ShapePair work = queue.Dequeue();
+                    work.StartWork(resSignal);
                 }
                 else
                 {
-                    foreach (NormalShape shape in normalShapes)
-                    {
-                        shape.Close();
-                    }
+                    ThisLevelWork = new List<ShapePair>(queue);
+                    WaitHandle.WaitAll(results);
+                    return false;
                 }
             }
-            finally
-            {
-                thisLevel = new List<ShapePair>(queue);
-                Save();
-            }
-            return quit;
         }
 
         #endregion
@@ -545,6 +505,10 @@ namespace Zamboch.Cube21
         private static string reportFile = @"Cube\Report.txt";
         public const int ShapesCount = 90;
 
+        public DateTime[] TimeStart=new DateTime[15];
+        public DateTime[] TimeEnd = new DateTime[15];
+        public long[] LevelCounts = new long[15];
+
         [XmlIgnore]
         public Cube white = new Cube();
 
@@ -554,7 +518,7 @@ namespace Zamboch.Cube21
         public int SourceLevel = 0;
 
         public List<NormalShape> normalShapes = new List<NormalShape>();
-        public List<ShapePair> thisLevel = new List<ShapePair>();
+        public List<ShapePair> ThisLevelWork = new List<ShapePair>();
 
         protected Dictionary<uint, Shape> shapeNormalizer = new Dictionary<uint, Shape>();
         protected Dictionary<int, Shape> shapeIndexes = new Dictionary<int, Shape>();
