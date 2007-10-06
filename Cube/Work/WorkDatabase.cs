@@ -4,40 +4,6 @@ namespace Zamboch.Cube21.Work
 {
     public class WorkDatabase
     {
-        #region Loader
-
-        private static List<NormalShape> loadedShapes = new List<NormalShape>();
-        private static long timeStamp = 1;
-
-        public static void OnLoadShapeImpl(NormalShape shape)
-        {
-            NormalShape oldShape = null;
-            timeStamp++;
-            shape.LastTouch = timeStamp;
-            if (!shape.IsLoaded)
-            {
-                if (loadedShapes.Count > maxShapesLoaded)
-                {
-                    long mintime = long.MaxValue;
-                    oldShape = loadedShapes[0];
-                    foreach (NormalShape loadedShape in loadedShapes)
-                    {
-                        if (loadedShape.LastTouch < mintime)
-                        {
-                            oldShape = loadedShape;
-                            mintime = loadedShape.LastTouch;
-                        }
-                    }
-                    loadedShapes.Remove(oldShape);
-                }
-                loadedShapes.Add(shape);
-            }
-            if (oldShape!=null)
-                oldShape.Close();
-        }
-
-        #endregion
-
         #region Shapes order
 
         public static List<ShapePair> PrepareNextLevel(int sourceLevel)
@@ -93,7 +59,8 @@ namespace Zamboch.Cube21.Work
             return pairs;
         }
 
-        private const int maxShapesLoaded = 20; //TODO
+        public const int maxShapesLoaded = 20; //TODO
+        public const int preLoaded = 2; //TODO
 
         private static void ReorderPairs(List<ShapePair> pairs)
         {
@@ -109,7 +76,7 @@ namespace Zamboch.Cube21.Work
             {
                 int bestScore;
                 //kick weakest shape
-                if (shapesIn.Count + 1 > maxShapesLoaded)
+                if ((shapesIn.Count + 1) > (maxShapesLoaded-preLoaded))
                 {
                     do
                     {

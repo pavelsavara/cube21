@@ -264,7 +264,8 @@ namespace Zamboch.Cube21
         public int CompareTo(object obj)
         {
             Page p = (Page)obj;
-            return PageFullID.CompareTo(p.PageFullID);
+            int res = ShapeIndex.CompareTo(p.ShapeIndex); if (res != 0) return res;
+            return SmallIndex.CompareTo(p.SmallIndex);
         }
 
         #endregion

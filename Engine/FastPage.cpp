@@ -71,15 +71,6 @@ namespace Zamboch
 				}
 			}
 
-			byte lTouch(int smallIndex, int targetShapeIndex)
-			{
-				byte* dtpages[SmallPermCount];
-				memset(dtpages, 0,4*SmallPermCount);
-
-				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
-				byte d=dtpage[0] + dtpage[PageSize-1];
-				return d;
-			}
 
 			#pragma endregion
 		}
@@ -97,7 +88,21 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
-		    int FastPage::GetNextAddress(int lastAddress, int level)
+			byte lTouch(int smallIndex, int targetShapeIndex)
+			{
+				byte* dtpages[SmallPermCount];
+				memset(dtpages, 0,4*SmallPermCount);
+
+				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
+				byte d=0;
+				for(int address=0;address<PageSize;address+=2048)
+				{
+					d^=dtpage[address];
+				}
+				return d;
+			}
+
+			int FastPage::GetNextAddress(int lastAddress, int level)
 			{
 				return lGetNextAddress(dataPtr, lastAddress, level);
 			}

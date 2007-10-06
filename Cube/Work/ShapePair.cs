@@ -21,7 +21,7 @@ namespace Zamboch.Cube21.Work
 
         #region Construction
 
-        private ShapePair()
+        protected ShapePair()
         {
         }
 
@@ -42,6 +42,7 @@ namespace Zamboch.Cube21.Work
             {
                 queue = new Queue<WorkItem>(Work);
             }
+            Console.WriteLine("Started SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
             while (queue.Count > 0)
             {
                 WorkItem workItem = queue.Dequeue();
@@ -52,6 +53,7 @@ namespace Zamboch.Cube21.Work
                     return false;
                 }
             }
+            Console.WriteLine("Finished SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
             lock (this)
             {
                 Work.Clear();
@@ -64,33 +66,57 @@ namespace Zamboch.Cube21.Work
             NormalShape sourceShape = Database.GetShape(SourceShapeIndex);
             NormalShape targetShape = Database.GetShape(TargetShapeIndex);
 
-            sourceShape.Load();
-            targetShape.Load();
+            //source
+            try
+            {
+                if (sourceShape.Load())
+                    Console.WriteLine("Loaded SourceShape {0:00}", TargetShapeIndex);
 
-            List<WorkItem> copy;
-            lock(this)
-            {
-                copy=new List<WorkItem>(Work);
+                List<WorkItem> copy;
+                lock (this)
+                {
+                    copy = new List<WorkItem>(Work);
+                }
+                int d = 0;
+                foreach (WorkItem item in copy)
+                {
+                    Page sourcePage = sourceShape.GetPage(item.SourcePageSmallIndex);
+                    d += sourcePage.Touch();
+                }
+                Console.WriteLine("Touched SourceShape {0:00}, {1:000}", SourceShapeIndex, d);
             }
-            foreach (WorkItem item in copy)
+            finally
             {
-                Page sourcePage = sourceShape.GetPage(item.SourcePageSmallIndex);
-                byte d = sourcePage.Touch();
-                Console.WriteLine("Touch SourceShape {0:00}, SourcePage {1:0000} {2:000}",
-                                  SourceShapeIndex, item.SourcePageSmallIndex, d);
+                sourceShape.Release();
             }
-            List<Page> copyPages;
-            lock(targetShape)
+
+            //target
+            try
             {
-                copyPages = new List<Page>(targetShape.Pages);
+                if (targetShape.Load())
+                    Console.WriteLine("Loaded TargetShape {0:00}", TargetShapeIndex);
+
+                List<Page> copyPages;
+                lock (targetShape)
+                {
+                    copyPages = new List<Page>(targetShape.Pages);
+                }
+                int d = 0;
+                foreach (Page targetPage in copyPages)
+                {
+                    d += targetPage.Touch();
+                }
+                Console.WriteLine("Touched TargetShape {0:00}, {1:000}", TargetShapeIndex, d);
             }
-            foreach (Page targetPage in copyPages)
+            finally
             {
-                byte d=targetPage.Touch();
-                Console.WriteLine("Touch TargetShape {0:00}, TargetPage {1:0000} {2:000}",
-                                  TargetShapeIndex, targetPage.SmallIndex, d);
+                targetShape.Release();
             }
         }
+
+        #endregion
+
+        #region Helpers
 
         [XmlIgnore]
         public int ID
