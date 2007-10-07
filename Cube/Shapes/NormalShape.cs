@@ -14,13 +14,13 @@ namespace Zamboch.Cube21
         [XmlIgnore]
         public NormalShape Parent;
 
+        [XmlIgnore]
+        public ShapeLoader Loader;
+
         public int ParentShapeIndex = -1;
 
         public Step FromParentStep;
         public Cube ExampleCube;
-
-        [XmlIgnore]
-        public long LastTouch;
 
         [XmlIgnore]
         public List<NormalShape> Childern = new List<NormalShape>();
@@ -36,6 +36,7 @@ namespace Zamboch.Cube21
         public List<int> AllTargetShapeIndexes = new List<int>();
 
         public long[] LevelCounts = new long[15];
+        public long[] LevelFillCounts = new long[15];
 
         #endregion
 
@@ -57,51 +58,12 @@ namespace Zamboch.Cube21
 
         public Page GetPage(int smallIndex)
         {
-            return Database.GetPage(smallIndex, this);
+            return SmallIndexToPages[smallIndex];
         }
 
         public override bool IsNormal
         {
             get { return true; }
-        }
-
-		public virtual String FileName
-		{
-			get
-			{
-                return "Cube\\Shape" + ShapeIndex.ToString("00") + ".data";
-			}
-		}
-        
-        #endregion
-
-        #region Abstract loaders
-
-        public virtual bool IsLoaded
-        {
-            get { return false; }
-        }
-
-        public virtual bool IsUsed
-        {
-            get { return false; }
-        }
-
-        public virtual bool Load()
-        {
-            //void implementation
-            return false;
-        }
-
-        public virtual void Release()
-        {
-            //void implementation
-        }
-
-        public virtual bool Close()
-        {
-            //void implementation
-            return false;
         }
 
         #endregion
@@ -126,9 +88,9 @@ namespace Zamboch.Cube21
 
         #region Xml Deserialization
 
-        public void RegisterLoaded(RegisterShapeDelegate reg)
+        public void RegisterLoaded()
         {
-            reg(this);
+            Database.RegisterShape(this);
             if (ParentShapeIndex != -1)
             {
                 Parent = Database.GetShape(ParentShapeIndex);
@@ -137,7 +99,7 @@ namespace Zamboch.Cube21
             foreach (RotatedShape rotation in Rotations)
             {
                 rotation.NormalShape = this;
-                reg(rotation);
+                Database.RegisterShape(rotation);
             }
         }
 

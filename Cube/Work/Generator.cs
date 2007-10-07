@@ -292,8 +292,7 @@ namespace Zamboch
                         break;");
                 if (testing) break;
             }
-            tw.Write(
-                @"
+            tw.Write(@"
                 }
             }");
         }

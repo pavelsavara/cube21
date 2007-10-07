@@ -73,6 +73,20 @@ namespace Zamboch
 			}
 
 
+			byte lTouch(int smallIndex, int shapeIndex)
+			{
+				byte* dtpages[SmallPermCount];
+				memset(dtpages, 0,4*SmallPermCount);
+
+				byte* dtpage=GetPage(dtpages, smallIndex, shapeIndex);
+				byte d=0;
+				for(int address=0;address<PageSize;address+=2048)
+				{
+					d^=dtpage[address];
+				}
+				return d;
+			}
+
 			#pragma endregion
 		}
 	}
@@ -82,6 +96,7 @@ namespace Zamboch
 
 using namespace System::Runtime::InteropServices;
 using namespace System::IO;
+using namespace Zamboch::Cube21::Work;
 
 namespace Zamboch
 {
@@ -89,20 +104,6 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
-			byte lTouch(int smallIndex, int targetShapeIndex)
-			{
-				byte* dtpages[SmallPermCount];
-				memset(dtpages, 0,4*SmallPermCount);
-
-				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
-				byte d=0;
-				for(int address=0;address<PageSize;address+=2048)
-				{
-					d^=dtpage[address];
-				}
-				return d;
-			}
-
 			int FastPage::GetNextAddress(int lastAddress, int level)
 			{
 				return lGetNextAddress(dataPtr, lastAddress, level);
@@ -112,28 +113,27 @@ namespace Zamboch
 			{
 				if (lWrite(dataPtr, address, level))
 				{
-					LevelCounts[level]++;
+					Page->LevelCounts[level]++;
 					return true;
 				}
 				return false;
 			}
 
-			FastPage::FastPage(int smallIndex, NormalShape^ shape)
-				: Page(smallIndex, shape)
+			FastPage::FastPage(Zamboch::Cube21::Page^ page)
+				: PageLoader(page)
 			{
 				UpdatePointer();
 			}
 
 			void FastPage::UpdatePointer()
 			{
-				dataPtr=dynamic_cast<FastShape^>(Shape)->dataPtr + PageSize*SmallIndex;
+				dataPtr=dynamic_cast<FastShape^>(ShapeLoader)->dataPtr + PageSize*SmallIndex;
 			}
 
 			byte FastPage::Touch()
 			{
 				return lTouch(SmallIndex, ShapeIndex);
 			}
-
 		}
 	}
 }

@@ -49,8 +49,8 @@ namespace Zamboch
 			static byte* GetDataPage(int smallIndex, int targetShapeIndex, byte** dtpages)
 			{
 				byte* dtpage;
-				NormalShape^ targetShape=dynamic_cast<NormalShape^>(Database::GetShape(targetShapeIndex));
-				FastPage^ p=dynamic_cast<FastPage^>(targetShape->GetPage(smallIndex));
+				FastShape^ targetShape=dynamic_cast<FastShape^>(DatabaseManager::GetShapeLoader(targetShapeIndex));
+				FastPage^ p=dynamic_cast<FastPage^>(DatabaseManager::GetPageLoader(targetShape,smallIndex));
 				dtpage = p->dataPtr;
 				dtpages[smallIndex] = dtpage;
 				return dtpage;
@@ -63,11 +63,12 @@ namespace Zamboch
 				myCallback^ fp=gcnew myCallback(GetDataPage);
 				gch = GCHandle::Alloc(fp);
 				fnGetDataPage = static_cast<myCALLBACK>(Marshal::GetFunctionPointerForDelegate(fp).ToPointer());
-				loadedShapes = gcnew List<NormalShape^>;
+				loadedShapes = gcnew List<FastShape^>;
 			}
 
 
-			FastShape::FastShape()
+			FastShape::FastShape(Zamboch::Cube21::NormalShape^ shape)
+				: ShapeLoader(shape)
 			{
 				fileHandle=INVALID_HANDLE_VALUE;
 			}
@@ -120,9 +121,9 @@ namespace Zamboch
 					}
 
 					//data = (IntPtr)dataPtr;
-					for(int p=0;p<Pages->Count;p++)
+					for(int p=0;p<Shape->Pages->Count;p++)
 					{
-						FastPage^ fp=dynamic_cast<FastPage^>(Pages[p]);
+						FastPage^ fp=dynamic_cast<FastPage^>(Shape->Pages[p]->Loader);
 						fp->UpdatePointer();
 					}
 				}
@@ -152,13 +153,13 @@ namespace Zamboch
 
 			void FastShape::KickOld()
 			{
-				NormalShape^ oldShape;
+				FastShape^ oldShape;
 				while (true)
 				{
 					try
 					{
 						Monitor::Enter(loadedShapes);
-						if (loadedShapes->Count <= Zamboch::Cube21::Work::WorkDatabase::maxShapesLoaded)
+						if (loadedShapes->Count <= Zamboch::Cube21::Work::DatabaseManager::maxShapesLoaded)
 						{
 							break;
 						}
@@ -166,7 +167,7 @@ namespace Zamboch
 						oldShape = loadedShapes[0];
 						for(int i=0;i<loadedShapes->Count;i++)
 						{
-							NormalShape^ shape = loadedShapes[i];
+							FastShape^ shape = loadedShapes[i];
 							if (!shape->IsUsed && shape->LastTouch < mintime)
 							{
 								oldShape = shape;

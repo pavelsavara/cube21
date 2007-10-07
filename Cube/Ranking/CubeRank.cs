@@ -32,7 +32,7 @@ namespace Zamboch.Cube21.Ranking
                 toBitsEx[index] = bitsex;
             }
 #if DEBUG
-    //validate
+            //validate
             for (int index = 0; index < PermCount; index++)
             {
                 byte[] bytes = SilverRank.UnRank(index);
@@ -141,7 +141,7 @@ namespace Zamboch.Cube21.Ranking
             }
 
 #if DEBUG
-    //validate
+            //validate
             for (int index = 0; index < PermCount; index++)
             {
                 byte[] bytes = FullRank.Unrank(index);
