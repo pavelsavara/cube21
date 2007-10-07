@@ -16,6 +16,7 @@ namespace Zamboch
 #pragma managed
 
 using namespace Zamboch::Cube21::Ranking;
+using namespace Zamboch::Cube21::Work;
 using namespace System;
 using namespace System::Collections::Generic;
 
@@ -25,10 +26,10 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
-			public ref class FastShape : public NormalShape
+			public ref class FastShape : public ShapeLoader
 			{
 			public:
-				FastShape();
+				FastShape(Zamboch::Cube21::NormalShape^ shape);
 				~FastShape();
 
 				virtual bool Load() override;
@@ -51,21 +52,13 @@ namespace Zamboch
 					}
 				}
 
-				[System::Xml::Serialization::XmlIgnoreAttribute]
 				HANDLE mappingHandle;
-
-				[System::Xml::Serialization::XmlIgnoreAttribute]
 				HANDLE fileHandle;
-
-				[System::Xml::Serialization::XmlIgnoreAttribute]
 				byte* dataPtr;
-
-				[System::Xml::Serialization::XmlIgnoreAttribute]
 				int loadedCount;
-				[System::Xml::Serialization::XmlIgnoreAttribute]
 				bool isLoaded;
 			private:
-				static List<NormalShape^>^ loadedShapes;
+				static List<FastShape^>^ loadedShapes;
 				static long timeStamp = 1;
 				void LoadInternal();
 				void CloseInternal();

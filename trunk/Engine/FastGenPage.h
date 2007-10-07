@@ -26,17 +26,13 @@ namespace Zamboch
 		{
 			public ref class FastGenPage : public FastPage
 			{
-			private:
-				FastGenPage()
-				{
-				}
 			public:
-				FastGenPage(int smallIndex, NormalShape^ shape)
-					: FastPage(smallIndex, shape)
+				FastGenPage(Zamboch::Cube21::Page^ page)
+					: FastPage(page)
 				{
 				}
 
-				virtual void ExpandCubes(NormalShape^ targetShape, int sourceLevel) override
+				virtual void ExpandCubes(Zamboch::Cube21::Work::ShapeLoader^ targetShape, int sourceLevel) override
 				{
 					int cntpages[SmallPermCount];
 					memset(cntpages, 0,4*SmallPermCount);
@@ -54,8 +50,8 @@ namespace Zamboch
 						{
 							if (cntpages[i]>0)
 							{
-								FastPage^ p=dynamic_cast<FastPage^>(targetShape->GetPage(i));
-								p->LevelCounts[tgLevel]+=cntpages[i];
+								FastPage^ p=dynamic_cast<FastPage^>(DatabaseManager::GetPageLoader(targetShape, i));
+								p->Page->LevelCounts[tgLevel]+=cntpages[i];
 							}
 						}
 					}
@@ -65,6 +61,40 @@ namespace Zamboch
 					}
 				}
 				void ExpandPage(int sourceLevel, int sourceSmallIndex, int targetShapeIndex, byte* dataPtr, int* cntpages);
+
+
+				virtual void FillGaps() override
+				{
+					int cntpages[SmallPermCount*15];
+					memset(cntpages, 0,4*SmallPermCount*15);
+					int sourceSmallIndex = SmallIndex;
+
+					FillGaps(sourceSmallIndex, dataPtr, cntpages);
+
+					try
+					{
+						Monitor::Enter(this);
+
+						for(int i=0;i<SmallPermCount;i++)
+						{
+							for(int l=0;l<SmallPermCount;l++)
+							{
+								if (cntpages[i+(l*SmallPermCount)]>0)
+								{
+									FastPage^ p=dynamic_cast<FastPage^>(DatabaseManager::GetPageLoader(ShapeLoader, i));
+									p->Page->LevelFillCounts[l]+=cntpages[i];
+								}
+							}
+						}
+					}
+					finally
+					{
+						Monitor::Exit(this);
+					}
+				}
+
+				void FillGaps(int sourceSmallIndex, byte* dataPtr, int* cntpages)
+				{}
 			};
 		}
 	}

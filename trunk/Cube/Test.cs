@@ -8,7 +8,8 @@ namespace Zamboch.Cube21
     {
         public static void Main()
         {
-            Database.Initialize();
+            DatabaseManager manager = new DatabaseManager();
+            manager.Initialize();
             Generator.Dump();
         }
 

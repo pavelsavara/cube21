@@ -9,10 +9,13 @@ namespace Zamboch.Cube21.Work
 
         [XmlAttribute]
         public int SourceShapeIndex;
+
         [XmlAttribute]
         public int SourcePageSmallIndex;
+
         [XmlAttribute]
         public int TargetShapeIndex;
+
         [XmlAttribute]
         public int SourceLevel;
 
@@ -38,9 +41,9 @@ namespace Zamboch.Cube21.Work
 
         public bool DoWork()
         {
-            NormalShape sourceShape = Database.GetShape(SourceShapeIndex);
-            NormalShape targetShape = Database.GetShape(TargetShapeIndex);
-            Page sourcePage = sourceShape.GetPage(SourcePageSmallIndex);
+            ShapeLoader sourceShape = DatabaseManager.GetShapeLoader(SourceShapeIndex);
+            ShapeLoader targetShape = DatabaseManager.GetShapeLoader(TargetShapeIndex);
+            PageLoader sourcePage = DatabaseManager.GetPageLoader(sourceShape, SourcePageSmallIndex);
 
             /*
             string time = DateTime.Now.ToLongTimeString();
@@ -68,10 +71,10 @@ namespace Zamboch.Cube21.Work
             {
                 sourceShape.Release();
             }
-            
+
             return true;
         }
-        
+
         #endregion
 
         #region Extensions
@@ -88,7 +91,7 @@ namespace Zamboch.Cube21.Work
         {
             return
                 SourceShapeIndex + (TargetShapeIndex * 90) + (SourcePageSmallIndex * 90 * 90) +
-                (SourceLevel *90 * 90 * 2600);
+                (SourceLevel * 90 * 90 * 2600);
         }
 
         public int CompareTo(object obj)

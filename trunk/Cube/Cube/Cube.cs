@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Xml.Schema;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Ranking;
 

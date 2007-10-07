@@ -25,8 +25,10 @@ namespace Zamboch
 
 #include "FastRank.h"
 #include "FastShape.h"
-using namespace Zamboch::Cube21::Ranking;
 using namespace System::Collections::Generic;
+using namespace Zamboch::Cube21::Ranking;
+using namespace Zamboch::Cube21::Work;
+using namespace Zamboch::Cube21;
 
 namespace Zamboch
 {
@@ -34,10 +36,10 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
-			public ref class FastPage : public Page
+			public ref class FastPage : public PageLoader
 			{
 			public:
-				FastPage(int smallIndex, NormalShape^ shape);
+				FastPage(Zamboch::Cube21::Page^ page);
 
 				virtual bool Write(int address, int level) override;
 		        virtual int GetNextAddress(int lastAddress, int level) override;
@@ -46,10 +48,6 @@ namespace Zamboch
 
 				[System::Xml::Serialization::XmlIgnoreAttribute]
 				byte* dataPtr;
-			protected:
-				FastPage()
-				{
-				}
 			private:
 			};
 		}

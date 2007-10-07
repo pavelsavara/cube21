@@ -45,14 +45,17 @@
     <Compile Include="Actions\Action.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Actions\Correction.cs" />
+    <Compile Include="Work\DatabaseManagerBase.cs" />
+    <Compile Include="Work\DatabaseManager.cs" />
     <Compile Include="Work\Generator.cs" />
     <Compile Include="Cube\Cube.cs" />
     <Compile Include="Shapes\NormalShape.cs" />
     <Compile Include="Actions\Path.cs" />
     <Compile Include="Shapes\RotatedShape.cs" />
+    <Compile Include="Work\PageLoader.cs" />
+    <Compile Include="Work\ShapeLoader.cs" />
     <Compile Include="Work\ShapePair.cs" />
     <Compile Include="Actions\SmartStep.cs" />
-    <Compile Include="Work\WorkDatabase.cs" />
     <Compile Include="Work\WorkItem.cs" />
     <Compile Include="Ranking\CubeRank.cs" />
     <Compile Include="Database.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Actions\Step.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="Work\WorkQueue.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -11,42 +11,34 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
-			public ref class DatabaseExt : public Database
+			public ref class DatabaseExt : public DatabaseManager
 			{
 			public:
 				static void Main()
 				{
-					if (CreateDatabase())
+					DatabaseExt^ manager = gcnew DatabaseExt();
+		            manager->Initialize();
+					DatabaseManager::Database->IsLocal = true;
+					if (manager->Explore())
 					{
+						//manager->FillGaps();
 						//Test.TestData();
 					}
 				}
 
+				virtual Zamboch::Cube21::Work::PageLoader^ CreatePageLoder(Page^ page) override
+				{
+					return gcnew FastGenPage(page);
+				}
+
+				virtual Zamboch::Cube21::Work::ShapeLoader^ CreateShapeLoder(NormalShape^ shape) override
+				{
+					return gcnew FastShape(shape);
+				}
+			private:
 				static DatabaseExt()
 				{
-					instance = gcnew DatabaseExt();
-
-					array<Type^>^ types = gcnew array<Type^> {DatabaseExt::typeid, FastPage::typeid, FastGenPage::typeid, FastShape::typeid};
-
-					databaseSerializer = gcnew XmlSerializer(DatabaseExt::typeid, types);
 					Ranking::FastRank::Touch();
-					Initialize();
-				}
-
-				static bool CreateDatabase()
-				{
-					return Database::CreateDatabase();
-				}
-			protected:
-		        
-				virtual Page^ CreatePageImpl(int smallIndex, NormalShape^ shape) override 
-				{
-					return gcnew FastGenPage(smallIndex, shape);
-				}
-
-				virtual NormalShape^ CreateShapeImpl() override
-				{
-					return gcnew FastShape();
 				}
 			};
 		}
