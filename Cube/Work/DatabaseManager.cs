@@ -142,7 +142,7 @@ namespace Zamboch.Cube21.Work
         {
             if (!Database.IsFilled)
                 return true;
-            throw new NotImplementedException(); //TODO
+            
             if (!DoWork())
                 return false;
             return true;

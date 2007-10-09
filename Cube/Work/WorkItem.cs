@@ -39,19 +39,11 @@ namespace Zamboch.Cube21.Work
 
         #region Public methods
 
-        public bool DoWork()
+        public bool ExploreCubes()
         {
             ShapeLoader sourceShape = DatabaseManager.GetShapeLoader(SourceShapeIndex);
             ShapeLoader targetShape = DatabaseManager.GetShapeLoader(TargetShapeIndex);
             PageLoader sourcePage = DatabaseManager.GetPageLoader(sourceShape, SourcePageSmallIndex);
-
-            /*
-            string time = DateTime.Now.ToLongTimeString();
-            int count = sourcePage.LevelCounts[SourceLevel];
-            Console.WriteLine("{5} Level {0}, TargetShape {2:00}, SourceShape {1:00}, SourcePage {3:0000}({4:00000})",
-                              SourceLevel, SourceShapeIndex, TargetShapeIndex, SourcePageSmallIndex,
-                              count, time);
-             */
 
             try
             {
@@ -60,7 +52,7 @@ namespace Zamboch.Cube21.Work
                 {
                     targetShape.Load();
 
-                    sourcePage.ExpandCubes(targetShape, SourceLevel);
+                    sourcePage.ExploreCubes(targetShape, SourceLevel);
                 }
                 finally
                 {

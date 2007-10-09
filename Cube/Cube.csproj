@@ -63,7 +63,6 @@
     <Compile Include="Shapes\Page.cs" />
     <Compile Include="Cube\Piece.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Cube.snk" />
     <Compile Include="Ranking\Rank.cs" />
     <Compile Include="Ranking\MultiRank.cs" />
     <Compile Include="Shapes\Shape.cs" />

@@ -5,12 +5,20 @@ using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Work
 {
+    public enum Work
+    {
+        ExpandCubes,
+        FillGaps,
+    }
     public class ShapePair : IComparable
     {
         #region Data
 
         [XmlAttribute]
         public int SourceShapeIndex;
+
+        [XmlAttribute]
+        public Work WorkType;
 
         [XmlAttribute]
         public int TargetShapeIndex;
@@ -61,7 +69,7 @@ namespace Zamboch.Cube21.Work
             while (queue.Count > 0)
             {
                 WorkItem workItem = queue.Dequeue();
-                workItem.DoWork();
+                workItem.ExploreCubes();
                 if (Console.KeyAvailable)
                 {
                     Work = new List<WorkItem>(queue);

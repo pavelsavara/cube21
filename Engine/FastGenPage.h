@@ -32,14 +32,14 @@ namespace Zamboch
 				{
 				}
 
-				virtual void ExpandCubes(Zamboch::Cube21::Work::ShapeLoader^ targetShape, int sourceLevel) override
+				virtual void ExploreCubes(Zamboch::Cube21::Work::ShapeLoader^ targetShape, int sourceLevel) override
 				{
 					int cntpages[SmallPermCount];
 					memset(cntpages, 0,4*SmallPermCount);
 					int targetShapeIndex = targetShape->ShapeIndex;
 					int sourceSmallIndex = SmallIndex;
 
-					ExpandPage(sourceLevel, sourceSmallIndex, targetShapeIndex, dataPtr, cntpages);
+					ExplorePage(sourceLevel, sourceSmallIndex, targetShapeIndex, dataPtr, cntpages);
 
 					try
 					{
@@ -60,8 +60,7 @@ namespace Zamboch
 						Monitor::Exit(this);
 					}
 				}
-				void ExpandPage(int sourceLevel, int sourceSmallIndex, int targetShapeIndex, byte* dataPtr, int* cntpages);
-
+				void ExplorePage(int sourceLevel, int sourceSmallIndex, int targetShapeIndex, byte* dataPtr, int* cntpages);
 
 				virtual void FillGaps() override
 				{
@@ -69,7 +68,7 @@ namespace Zamboch
 					memset(cntpages, 0,4*SmallPermCount*15);
 					int sourceSmallIndex = SmallIndex;
 
-					FillGaps(sourceSmallIndex, dataPtr, cntpages);
+					FillPage(sourceSmallIndex, dataPtr, cntpages);
 
 					try
 					{
@@ -92,9 +91,7 @@ namespace Zamboch
 						Monitor::Exit(this);
 					}
 				}
-
-				void FillGaps(int sourceSmallIndex, byte* dataPtr, int* cntpages)
-				{}
+				void FillPage(int sourceSmallIndex, byte* dataPtr, int* cntpages);
 			};
 		}
 	}

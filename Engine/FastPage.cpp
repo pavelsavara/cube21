@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "FastPage.h"
 #include <vcclr.h>
+#include <intrin.h>
 
 #pragma unmanaged
 
@@ -11,29 +12,23 @@ namespace Zamboch
 		namespace Engine
 		{
 			#pragma region Page operations
-			bool lWrite(byte* dataPtr, int address, int level)
+
+			bool lWrite(byte* dataPtr, int offset, int level)
 			{
-				//no need to synchronize, all workers will write same level, in case of colision
-				bool hi=((address&0x1) == 0x1);
-				address>>=1;
-				byte d=dataPtr[address];
-				if (hi)
+				unsigned int shift=((offset&0x7))*4;
+				long* adrAligned=(long*)(((offset>>1) & 0xFFFFFFFC)+dataPtr);
+
+				long dataOrig;
+				long data;
+				do
 				{
-					if ((d&0xF0)!=0x00)
-					{
+					dataOrig=*adrAligned;
+					data=dataOrig;
+					if (((data>>shift)&0xF)!=0)
 						return false;
-					}
-					d|=level<<4;
+					data|=level<<shift;
 				}
-				else
-				{
-					if ((d&0x0F)!=0x00)
-				{
-					return false;
-				}
-					d|=level;
-				}
-				dataPtr[address]=d;
+				while (dataOrig!=_InterlockedCompareExchange(adrAligned, data, dataOrig));
 				return true;
 			}
 
