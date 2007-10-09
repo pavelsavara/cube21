@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Zamboch.Cube21.Actions;
@@ -48,7 +48,7 @@ namespace Zamboch.Cube21.Work
             //void implementation
         }
 
-        public virtual void ExpandCubes(ShapeLoader targetShape, int sourceLevel)
+        public virtual void ExploreCubes(ShapeLoader targetShape, int sourceLevel)
         {
             PageLoader[] tgpages = new PageLoader[SmallCubeRank.PermCount];
 #if DEBUG
