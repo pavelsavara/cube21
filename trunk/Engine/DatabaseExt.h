@@ -21,7 +21,8 @@ namespace Zamboch
 					DatabaseManager::Database->IsLocal = true;
 					if (manager->Explore())
 					{
-						//manager->FillGaps();
+						manager->FillGaps();
+						manager->Database->DumpShapes();
 						//Test.TestData();
 					}
 				}

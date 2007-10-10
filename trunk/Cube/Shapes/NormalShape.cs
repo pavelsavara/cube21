@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml.Serialization;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Work;
@@ -66,6 +67,16 @@ namespace Zamboch.Cube21
             get { return true; }
         }
 
+        public string Name
+        {
+            get
+            {
+                string top = Enum.GetName(typeof(HalfShape), Database.halfShapeNormalizer[TopBits]).Substring(3);
+                string bot = Enum.GetName(typeof(HalfShape), Database.halfShapeNormalizer[BotBits]).Substring(3);
+                return "[" + top + " & " + bot + "]";
+            }
+        }
+
         #endregion
 
         #region Public Helpers
@@ -84,10 +95,6 @@ namespace Zamboch.Cube21
             return selectedSteps;
         }
 
-        #endregion
-
-        #region Xml Deserialization
-
         public void RegisterLoaded()
         {
             Database.RegisterShape(this);
@@ -103,14 +110,54 @@ namespace Zamboch.Cube21
             }
         }
 
-        #endregion
-
-        #region IComparable Members
-
         public int CompareTo(object obj)
         {
             NormalShape n = (NormalShape)obj;
             return ShapeIndex.CompareTo(n.ShapeIndex);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0:00} {1}", ShapeIndex, Name);
+        }
+
+        #endregion
+
+        #region Half Shapes
+
+        public void AddHalfShapes()
+        {
+            uint nbits = TopBits;
+            uint bits = nbits;
+            int pieces = TopPieces;
+            for (int t = 0; t < pieces; t++)
+            {
+                AddHalf(bits, nbits);
+                bits = ror(bits, pieces);
+            }
+            nbits = BotBits;
+            bits = nbits;
+            pieces = BotPieces;
+            for (int t = 0; t < pieces; t++)
+            {
+                AddHalf(bits, nbits);
+                bits = ror(bits, pieces);
+            }
+        }
+
+        private static uint ror(uint val, int len)
+        {
+            uint mask = 0xFFFFFFFF >> 32 - len;
+            return ((val >> 1) | (val << (len - 1))) & mask;
+        }
+
+
+        private static void AddHalf(uint bits, uint normalBits)
+        {
+            if (!Database.halfShapeNormalizer.ContainsKey(bits))
+            {
+                Database.halfShapeNormalizer.Add(bits, (HalfShape)normalBits);
+            }
         }
 
         #endregion

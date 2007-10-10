@@ -38,6 +38,8 @@ namespace Zamboch.Cube21
         public static Dictionary<uint, Shape> shapeNormalizer = new Dictionary<uint, Shape>();
         public static Dictionary<int, Shape> shapeIndexes = new Dictionary<int, Shape>();
 
+        public static Dictionary<uint, HalfShape> halfShapeNormalizer = new Dictionary<uint, HalfShape>();
+
         private static readonly string databaseFile = @"Cube\Database.xml";
         private static readonly string reportFile = @"Cube\Report.txt";
         public const int ShapesCount = 90;
@@ -104,12 +106,12 @@ namespace Zamboch.Cube21
             if (shape.IsNormal)
             {
                 NormalShape nshape = (NormalShape)shape;
-                //Database.normalShapes.Add(nshape);
                 foreach (Page page in nshape.Pages)
                 {
                     page.Shape = nshape;
                     nshape.SmallIndexToPages.Add(page.SmallIndex, page);
                 }
+                nshape.AddHalfShapes();
             }
         }
 
@@ -122,21 +124,31 @@ namespace Zamboch.Cube21
             StreamWriter sw = new StreamWriter(reportFile);
             foreach (NormalShape shape in normalShapes)
             {
-                sw.Write(shape);
-                sw.Write(" ");
+                sw.Write("{0,-26}", shape);
+                sw.Write(" -> ");
                 if (shape.ParentShapeIndex == -1)
-                    sw.Write("  ");
+                    sw.Write("   ");
                 else
-                    sw.Write(shape.ParentShapeIndex.ToString("00"));
+                    sw.Write("P{0:00}", shape.ParentShapeIndex);
                 sw.Write(" L");
                 sw.Write(shape.Level.ToString("0"));
-                sw.Write(" *");
-                sw.Write(shape.Rotations.Count.ToString("00"));
-                sw.Write(" >");
-                foreach (RotatedShape rotation in shape.Rotations)
+                sw.Write(" A{0:00}", shape.Alternatives.Count);
+                sw.Write(" [{1:00}&{2:00}] {0}", shape.Code, shape.TopPieces, shape.BotPieces);
+                sw.Write(" > ");
+                foreach (int shapeIndex in shape.AllTargetShapeIndexes)
                 {
-                    sw.Write(" ");
-                    sw.Write(rotation);
+                    if (shapeIndex > shape.ShapeIndex)
+                    {
+                        sw.Write("{0,-26}", GetShape(shapeIndex));
+                    }
+                }
+                sw.Write(" <= ");
+                foreach (int shapeIndex in shape.AllTargetShapeIndexes)
+                {
+                    if (shapeIndex <= shape.ShapeIndex)
+                    {
+                        sw.Write("{0,-26}", GetShape(shapeIndex));
+                    }
                 }
                 sw.WriteLine();
             }
@@ -145,12 +157,45 @@ namespace Zamboch.Cube21
             foreach (NormalShape shape in normalShapes)
             {
                 sw.Write(shape.ShapeIndex.ToString("00"));
-                sw.Write(" -> ");
-                foreach (int shapeIndex in shape.AllTargetShapeIndexes)
+                sw.Write("R{0,2} R>", shape.Rotations.Count);
+                foreach (RotatedShape rotation in shape.Rotations)
                 {
-                    sw.Write(shapeIndex.ToString("00 "));
+                    sw.Write(" ");
+                    sw.Write(rotation);
                 }
                 sw.WriteLine();
+            }
+
+            if (IsExplored)
+            {
+                sw.WriteLine();
+                sw.Write("             ");
+                for (int l = 0; l < 13; l++)
+                {
+                    sw.Write(" Level {0,2}   |", l);
+                }
+                sw.WriteLine();
+                foreach (NormalShape shape in normalShapes)
+                {
+                    sw.Write(shape.ShapeIndex.ToString("00"));
+                    sw.Write(" -> ");
+                    sw.Write(" P");
+                    sw.Write(shape.Pages.Count.ToString("0000"));
+                    for (int l = 0; l < 13; l++)
+                    {
+                        sw.Write("|L={0,10}", shape.LevelCounts[l]);
+                    }
+                    sw.WriteLine();
+                    if (IsFilled)
+                    {
+                        sw.Write("            ");
+                        for (int l = 0; l < 13; l++)
+                        {
+                            sw.Write("|F={0,10}", shape.LevelFillCounts[l]);
+                        }
+                        sw.WriteLine();
+                    }
+                }
             }
 
             sw.WriteLine();
@@ -174,11 +219,7 @@ namespace Zamboch.Cube21
             {
                 sw.Write("   ");
             }
-            sw.Write(" ");
-            sw.Write(l);
-            sw.Write(shape);
-            sw.Write(" ");
-            sw.Write(s);
+            sw.Write(" {0} {1,-26} {2}", l, shape, s);
             sw.WriteLine(path);
 
             if (shape.Childern != null)

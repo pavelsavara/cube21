@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Zamboch.Cube21.Actions;
 
@@ -165,6 +166,7 @@ namespace Zamboch.Cube21.Work
             Database.normalShapes.Add(normal);
             normal.ExampleCube = new Cube(cube);
 
+            normal.AddHalfShapes();
             AddRotations(cube, normal);
             return normal;
         }

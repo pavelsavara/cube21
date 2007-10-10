@@ -58,12 +58,21 @@ namespace Zamboch
 				while(true);
 			}
 
-			void lSave(int bigIndex, int smallIndex, int targetShapeIndex, int targetLevel, byte** dtpages, int* cntpages)
+			void lSaveExplore(int bigIndex, int smallIndex, int targetShapeIndex, int targetLevel, byte** dtpages, int* cntpages)
 			{
 				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
 				if (lWrite(dtpage, bigIndex, targetLevel))
 				{
 					cntpages[smallIndex]++;
+				}
+			}
+
+			void lSaveFill(int bigIndex, int smallIndex, int targetShapeIndex, int targetLevel, byte** dtpages, int* cntpages)
+			{
+				byte* dtpage=GetPage(dtpages, smallIndex, targetShapeIndex);
+				if (lWrite(dtpage, bigIndex, targetLevel))
+				{
+					cntpages[smallIndex+(targetLevel*SmallPermCount)]++;
 				}
 			}
 
