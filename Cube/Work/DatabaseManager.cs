@@ -6,6 +6,8 @@ namespace Zamboch.Cube21.Work
 {
     public class DatabaseManager : DatabaseManagerBase
     {
+        #region Construction & singleton
+
         public DatabaseManager()
         {
             if (instance != null)
@@ -13,12 +15,14 @@ namespace Zamboch.Cube21.Work
             instance = this;
         }
 
+        #endregion
+
         #region Data
 
         public static WorkQueue WorkQueue;
         public static DatabaseManager instance;
 
-        public static List<ShapePair> ThisLevelWork
+        public static List<ShapePair> ActualWork
         {
             get { return WorkQueue.ThisLevelWork; }
             set { WorkQueue.ThisLevelWork = value; }
@@ -106,67 +110,104 @@ namespace Zamboch.Cube21.Work
 
         #region Exploration
 
-        public static bool ExploreSpace()
+        public virtual bool Explore()
         {
-            if (!Database.IsLocal)
-                throw new InvalidOperationException();
             if (Database.IsExplored)
                 return true;
 
             try
             {
-                return instance.Explore();
+                if (ActualWork.Count == 0)
+                {
+                    InitFirstCube();
+                    WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
+                }
+
+                if (!DoWork())
+                    return false;
+                Database.IsExplored = true;
+                return true;
             }
             catch (Exception ex)
             {
-                Save();
                 Console.WriteLine(ex);
                 throw;
             }
-        }
-
-        public virtual bool Explore()
-        {
-            if (SourceLevel == 0)
+            finally
             {
-                InitFirstCube();
-                WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
+                Save();
             }
-            if (!DoWork()) 
-                return false;
-            Database.IsExplored = true;
-            return true;
         }
 
         public virtual bool FillGaps()
         {
-            if (!Database.IsFilled)
-                return true;
-            
-            if (!DoWork())
+            if (!Database.IsExplored)
                 return false;
-            return true;
+
+            if (Database.IsFilled)
+                return true;
+
+            try
+            {
+                if (ActualWork.Count == 0)
+                    InitFill();
+
+                if (!DoWork())
+                    return false;
+
+                long levelCount = 0;
+                for (int level = 0; level < 15; level++)
+                {
+                    foreach (NormalShape shape in Database.NormalShapes)
+                    {
+                        shape.LevelCounts[level] = 0;
+                        foreach (Page page in shape.Pages)
+                        {
+                            shape.LevelCounts[level] += page.LevelCounts[level];
+                        }
+                        levelCount += shape.LevelCounts[level];
+                    }
+                }
+
+                Database.IsFilled = true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+            finally
+            {
+                Save();
+            }
         }
 
         private bool DoWork()
         {
             while (true)
             {
-                if (ThisLevelWork.Count == 0)
+                if (ActualWork.Count == 0)
                 {
                     break;
                 }
 
-                Database.TimeStart[SourceLevel] = DateTime.Now;
+                if (!Database.IsExplored)
+                    Database.TimeStart[SourceLevel] = DateTime.Now;
                 if (DoLevel())
                 {
                     return false;
                 }
-                Database.TimeEnd[SourceLevel] = DateTime.Now;
-                Console.WriteLine("Next level!");
-                SourceLevel++;
+                if (!Database.IsExplored)
+                    Database.TimeEnd[SourceLevel] = DateTime.Now;
 
-                WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
+                if (!Database.IsExplored)
+                {
+                    Console.WriteLine("Next level!");
+                    SourceLevel++;
+                    WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
+                }
+
                 Save();
                 GC.Collect();
             }
@@ -175,7 +216,11 @@ namespace Zamboch.Cube21.Work
 
         public bool DoLevel()
         {
+#if DEBUG
+            int workersCount = 1;
+#else
             int workersCount = Environment.ProcessorCount + 1;
+#endif
             ManualResetEvent[] results = new ManualResetEvent[workersCount];
             Queue<ShapePair> queue = new Queue<ShapePair>(WorkQueue.ThisLevelWork);
 
@@ -196,13 +241,13 @@ namespace Zamboch.Cube21.Work
                 int w = WaitHandle.WaitAny(results);
                 if (Console.KeyAvailable)
                 {
-                    ThisLevelWork = new List<ShapePair>(queue);
+                    ActualWork = new List<ShapePair>(queue);
                     WaitHandle.WaitAll(results);
                     return true;
                 }
                 if (queue.Count > 0)
                 {
-                    int percent = 100 - ((queue.Count * 100) / ThisLevelWork.Count);
+                    int percent = 100 - ((queue.Count * 100) / ActualWork.Count);
                     Console.WriteLine("({0:00}%) Level {1}", percent, SourceLevel);
 
                     ManualResetEvent resSignal = results[w];
@@ -212,7 +257,7 @@ namespace Zamboch.Cube21.Work
                 }
                 else
                 {
-                    ThisLevelWork = new List<ShapePair>(queue);
+                    ActualWork = new List<ShapePair>(queue);
                     WaitHandle.WaitAll(results);
                     return false;
                 }
@@ -237,6 +282,20 @@ namespace Zamboch.Cube21.Work
             whitePage.Write(bigIndex, WorkQueue.SourceLevel);
             whiteShapeLoader.Release();
             whiteShapeLoader.Close();
+        }
+
+        public void InitFill()
+        {
+            foreach (NormalShape shape in Database.normalShapes)
+            {
+                ShapePair pair = new ShapePair(shape.ShapeIndex, shape.ShapeIndex);
+                pair.WorkType = WorkType.FillGaps;
+                foreach (Page page in shape.Pages)
+                {
+                    pair.Work.Add(new WorkItem(page, -1, -1));
+                }
+                ActualWork.Add(pair);
+            }
         }
 
         #endregion

@@ -124,7 +124,8 @@ namespace Zamboch
 					for(int p=0;p<Shape->Pages->Count;p++)
 					{
 						FastPage^ fp=dynamic_cast<FastPage^>(Shape->Pages[p]->Loader);
-						fp->UpdatePointer();
+						if (fp!=nullptr)
+							fp->UpdatePointer();
 					}
 				}
 				finally

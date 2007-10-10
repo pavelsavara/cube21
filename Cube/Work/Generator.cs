@@ -178,7 +178,7 @@ namespace Zamboch
 
                 tw.WriteLine(
                     @"
-                lSave(corrBigIndex, corrSmallIndex, {0}, level, dtpages, cntpages);", sourceShape.ShapeIndex);
+                lSaveFill(corrBigIndex, corrSmallIndex, {0}, level, dtpages, cntpages);", sourceShape.ShapeIndex);
                 if (testing) break;
             }
             tw.WriteLine(@"            }");
@@ -325,7 +325,7 @@ namespace Zamboch
                         targetShape.ShapeIndex);
                 tw.WriteLine(
                     @"
-    					lSave(targetBigIndex, targetSmallIndex, {0}, targetLevel, dtpages, cntpages);",
+    					lSaveExplore(targetBigIndex, targetSmallIndex, {0}, targetLevel, dtpages, cntpages);",
                     targetShape.ShapeIndex);
                     
                 if (testing) break;

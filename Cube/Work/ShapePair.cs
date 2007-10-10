@@ -5,11 +5,12 @@ using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Work
 {
-    public enum Work
+    public enum WorkType
     {
         ExpandCubes,
         FillGaps,
     }
+
     public class ShapePair : IComparable
     {
         #region Data
@@ -18,7 +19,7 @@ namespace Zamboch.Cube21.Work
         public int SourceShapeIndex;
 
         [XmlAttribute]
-        public Work WorkType;
+        public WorkType WorkType;
 
         [XmlAttribute]
         public int TargetShapeIndex;
@@ -61,15 +62,21 @@ namespace Zamboch.Cube21.Work
         public bool DoWork()
         {
             Queue<WorkItem> queue;
-            lock (this)
-            {
-                queue = new Queue<WorkItem>(Work);
-            }
+            queue = new Queue<WorkItem>(Work);
             Console.WriteLine("Started SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
             while (queue.Count > 0)
             {
                 WorkItem workItem = queue.Dequeue();
-                workItem.ExploreCubes();
+                switch (WorkType)
+                {
+                    case WorkType.ExpandCubes:
+                        workItem.ExploreCubes();
+                        break;
+                    case WorkType.FillGaps:
+                        workItem.FillGaps();
+                        break;
+
+                }
                 if (Console.KeyAvailable)
                 {
                     Work = new List<WorkItem>(queue);
@@ -77,10 +84,9 @@ namespace Zamboch.Cube21.Work
                 }
             }
             Console.WriteLine("Finished SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
-            lock (this)
-            {
-                Work.Clear();
-            }
+            if (WorkType==WorkType.FillGaps)
+                DatabaseManager.GetShapeLoader(SourceShapeIndex).Close();
+            Work.Clear();
             return true;
         }
 

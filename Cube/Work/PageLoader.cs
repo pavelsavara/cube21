@@ -134,11 +134,6 @@ namespace Zamboch.Cube21.Work
             get { return true; }
         }
 
-        public virtual void UpdatePointer()
-        {
-            //void implementation
-        }
-
         public virtual bool Write(int address, int level)
         {
             bool hi = ((address & 0x1) == 0x1);

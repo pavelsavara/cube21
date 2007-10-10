@@ -76,12 +76,13 @@ namespace Zamboch
 
 						for(int i=0;i<SmallPermCount;i++)
 						{
-							for(int l=0;l<SmallPermCount;l++)
+							for(int l=0;l<15;l++)
 							{
-								if (cntpages[i+(l*SmallPermCount)]>0)
+								int c=cntpages[i+(l*SmallPermCount)];
+								if (c>0)
 								{
 									FastPage^ p=dynamic_cast<FastPage^>(DatabaseManager::GetPageLoader(ShapeLoader, i));
-									p->Page->LevelFillCounts[l]+=cntpages[i];
+									p->Page->LevelFillCounts[l]+=c;
 								}
 							}
 						}

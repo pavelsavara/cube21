@@ -45,6 +45,7 @@
     <Compile Include="Actions\Action.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Actions\Correction.cs" />
+    <Compile Include="Shapes\HalfShape.cs" />
     <Compile Include="Work\DatabaseManagerBase.cs" />
     <Compile Include="Work\DatabaseManager.cs" />
     <Compile Include="Work\Generator.cs" />

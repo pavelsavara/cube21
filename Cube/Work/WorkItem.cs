@@ -67,6 +67,24 @@ namespace Zamboch.Cube21.Work
             return true;
         }
 
+        public bool FillGaps()
+        {
+            ShapeLoader shape = DatabaseManager.GetShapeLoader(SourceShapeIndex);
+            PageLoader page = DatabaseManager.GetPageLoader(shape, SourcePageSmallIndex);
+
+            try
+            {
+                shape.Load();
+                page.FillGaps();
+            }
+            finally
+            {
+                shape.Release();
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Extensions

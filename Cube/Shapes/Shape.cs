@@ -47,10 +47,48 @@ namespace Zamboch.Cube21
             get { return 16 - (int)((ShapeBits & 0xF000000) >> 24); }
         }
 
+        public string Code
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder(18);
+                uint top = TopBits;
+                for (int t = TopPieces - 1; t >= 0; t--)
+                {
+                    if (((top >> t) & 0x1) == 1)
+                    {
+                        sb.Append('C');
+                    }
+                    else
+                    {
+                        sb.Append('e');
+                    }
+                }
+                sb.Append('/');
+                uint bot = BotBits;
+                for (int b = BotPieces - 1; b >= 0; b--)
+                {
+                    if (((bot >> b) & 0x1) == 1)
+                    {
+                        sb.Append('C');
+                    }
+                    else
+                    {
+                        sb.Append('e');
+                    }
+                }
+                return sb.ToString();
+            }
+        }
+
         #endregion
 
         #region Helpers
 
+        /// <summary>
+        /// e is small cube, c is big one
+        /// 0 is small cube, 1 is big one
+        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(18);
@@ -59,31 +97,7 @@ namespace Zamboch.Cube21
             else
                 sb.Append(ShapeIndex.ToString("0000"));
             sb.Append(" ");
-            uint top = TopBits;
-            for (int t = TopPieces - 1; t >= 0; t--)
-            {
-                if (((top >> t) & 0x1) == 1)
-                {
-                    sb.Append('c');
-                }
-                else
-                {
-                    sb.Append('e');
-                }
-            }
-            sb.Append('/');
-            uint bot = BotBits;
-            for (int b = BotPieces - 1; b >= 0; b--)
-            {
-                if (((bot >> b) & 0x1) == 1)
-                {
-                    sb.Append('c');
-                }
-                else
-                {
-                    sb.Append('e');
-                }
-            }
+            sb.Append(Code);
             return sb.ToString();
         }
 

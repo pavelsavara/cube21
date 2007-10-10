@@ -16,7 +16,8 @@ namespace Zamboch
 			const int SmallPermCount = 2520;
 			const int BigPermCount = 40320;
 			const int PageSize = BigPermCount/2;
-			void lSave(int bigIndex, int smallIndex, int targetShapeIndex, int sourceLevel, byte** dtpages, int* cntpages);
+			void lSaveExplore(int bigIndex, int smallIndex, int targetShapeIndex, int sourceLevel, byte** dtpages, int* cntpages);
+			void lSaveFill(int bigIndex, int smallIndex, int targetShapeIndex, int sourceLevel, byte** dtpages, int* cntpages);
 		}
 	}
 }
@@ -43,7 +44,7 @@ namespace Zamboch
 
 				virtual bool Write(int address, int level) override;
 		        virtual int GetNextAddress(int lastAddress, int level) override;
-				virtual void UpdatePointer() override;
+				virtual void UpdatePointer();
 				virtual byte Touch() override;
 
 				[System::Xml::Serialization::XmlIgnoreAttribute]
