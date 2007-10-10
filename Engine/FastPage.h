@@ -42,6 +42,7 @@ namespace Zamboch
 			public:
 				FastPage(Zamboch::Cube21::Page^ page);
 
+				virtual byte Read(int address) override;
 				virtual bool Write(int address, int level) override;
 		        virtual int GetNextAddress(int lastAddress, int level) override;
 				virtual void UpdatePointer();

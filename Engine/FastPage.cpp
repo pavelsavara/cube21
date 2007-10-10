@@ -108,9 +108,25 @@ namespace Zamboch
 	{
 		namespace Engine
 		{
+
 			int FastPage::GetNextAddress(int lastAddress, int level)
 			{
 				return lGetNextAddress(dataPtr, lastAddress, level);
+			}
+
+			byte FastPage::Read(int address)
+			{
+				bool hi = ((address & 0x1) == 0x1);
+				address >>= 1;
+				byte d = dataPtr[address];
+				if (hi)
+				{
+					return (byte)((d & 0xF0) >> 4);
+				}
+				else
+				{
+					return (byte)((d & 0x0F));
+				}
 			}
 
 			bool FastPage::Write(int address, int level)

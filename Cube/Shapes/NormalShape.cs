@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 using Zamboch.Cube21.Actions;
+using Zamboch.Cube21.Ranking;
 using Zamboch.Cube21.Work;
 
 namespace Zamboch.Cube21
@@ -38,6 +38,8 @@ namespace Zamboch.Cube21
 
         public long[] LevelCounts = new long[15];
         public long[] LevelFillCounts = new long[15];
+        [XmlAttribute]
+        public long MissingCount = (SmallCubeRank.PermCount * BigCubeRank.PermCount);
 
         #endregion
 

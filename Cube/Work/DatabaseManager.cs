@@ -155,19 +155,7 @@ namespace Zamboch.Cube21.Work
                 if (!DoWork())
                     return false;
 
-                long levelCount = 0;
-                for (int level = 0; level < 15; level++)
-                {
-                    foreach (NormalShape shape in Database.NormalShapes)
-                    {
-                        shape.LevelCounts[level] = 0;
-                        foreach (Page page in shape.Pages)
-                        {
-                            shape.LevelCounts[level] += page.LevelCounts[level];
-                        }
-                        levelCount += shape.LevelCounts[level];
-                    }
-                }
+                ComputeCounts();
 
                 Database.IsFilled = true;
                 return true;
@@ -180,6 +168,28 @@ namespace Zamboch.Cube21.Work
             finally
             {
                 Save();
+            }
+        }
+
+        public void ComputeCounts()
+        {
+            for (int level = 0; level < 15; level++)
+            {
+                Database.LevelCounts[level] = 0;
+                Database.LevelFillCounts[level] = 0;
+                foreach (NormalShape shape in Database.NormalShapes)
+                {
+                    shape.LevelCounts[level] = 0;
+                    shape.LevelFillCounts[level] = 0;
+                    foreach (Page page in shape.Pages)
+                    {
+                        shape.LevelCounts[level] += page.LevelCounts[level];
+                        shape.LevelFillCounts[level] += page.LevelFillCounts[level];
+                    }
+                    shape.MissingCount -= (shape.LevelCounts[level] + shape.LevelFillCounts[level]);
+                    Database.LevelCounts[level] += shape.LevelCounts[level];
+                    Database.LevelFillCounts[level] += shape.LevelFillCounts[level];
+                }
             }
         }
 

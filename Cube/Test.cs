@@ -15,6 +15,31 @@ namespace Zamboch.Cube21
 
         public static void TestData()
         {
+            Random r = new Random();
+            Cube cube=new Cube();
+            int lastLevel = 1;
+            for (int i = 0; i < 1000; i++)
+            {
+                Cube next=new Cube(cube);
+                for (int t = 0; t < r.Next(6); t++)
+                {
+                    next.RotateNextTop();
+                }
+                for (int b = 0; b < r.Next(6); b++)
+                {
+                    next.RotateNextBot();
+                }
+                next.Turn();
+                int currentLevel = next.ReadLevel();
+                if (currentLevel != lastLevel + 1 && currentLevel != lastLevel - 1)
+                {
+                    next.WriteLevel(0xf);
+                    int level = next.ReadLevel();
+                    throw new InvalidProgramException();
+                }
+                lastLevel = currentLevel;
+                cube = next;
+            }
         }
 
         public static void TestPath()
