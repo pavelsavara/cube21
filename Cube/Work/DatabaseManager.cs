@@ -201,6 +201,13 @@ namespace Zamboch.Cube21.Work
                 {
                     break;
                 }
+                /*
+                if (SourceLevel == 4)
+                {
+                    Database.IsExplored = true;
+                    SourceLevel++;
+                    break;
+                }*/
 
                 if (!Database.IsExplored)
                     Database.TimeStart[SourceLevel] = DateTime.Now;

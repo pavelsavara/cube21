@@ -19,6 +19,7 @@ namespace Zamboch
 					DatabaseExt^ manager = gcnew DatabaseExt();
 		            manager->Initialize();
 					DatabaseManager::Database->IsLocal = true;
+					//Test::TestData();
 					if (manager->Explore())
 					{
 						if (manager->FillGaps())
