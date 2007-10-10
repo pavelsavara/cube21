@@ -21,10 +21,12 @@ namespace Zamboch
 					DatabaseManager::Database->IsLocal = true;
 					if (manager->Explore())
 					{
-						manager->FillGaps();
-						manager->Database->DumpShapes();
-						//Test.TestData();
+						if (manager->FillGaps())
+						{
+							Test::TestData();
+						}
 					}
+					manager->Database->DumpShapes();
 				}
 
 				virtual Zamboch::Cube21::Work::PageLoader^ CreatePageLoder(Page^ page) override

@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using System.Xml.Schema;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Ranking;
+using Zamboch.Cube21.Work;
 
 namespace Zamboch.Cube21
 {
@@ -542,6 +543,98 @@ namespace Zamboch.Cube21
         {
             string form = PieceHelper.ToString(top) + PieceHelper.ToString(bot);
             writer.WriteString(form);
+        }
+
+        #endregion
+
+        #region Database usage
+
+        public bool WriteLevel(int level)
+        {
+            Cube copy = new Cube(this);
+            copy.Normalize();
+            copy.Minimalize();
+            int bigIndex;
+            int smallIndex;
+            copy.GetIndexes(out bigIndex, out smallIndex);
+            ShapeLoader shapeLoader = DatabaseManager.GetShapeLoader(copy.ShapeIndex);
+            try
+            {
+                shapeLoader.Load();
+                PageLoader pageLoader = DatabaseManager.GetPageLoader(shapeLoader, smallIndex);
+                return pageLoader.Write(bigIndex, level);
+            }
+            finally
+            {
+                shapeLoader.Release();
+            }
+        }
+
+        public int ReadLevel()
+        {
+            Cube copy=new Cube(this);
+            copy.Normalize();
+            copy.Minimalize();
+            int bigIndex;
+            int smallIndex;
+            copy.GetIndexes(out bigIndex, out smallIndex);
+            ShapeLoader shapeLoader = DatabaseManager.GetShapeLoader(copy.ShapeIndex);
+            try
+            {
+                shapeLoader.Load();
+                PageLoader pageLoader = DatabaseManager.GetPageLoader(shapeLoader, smallIndex);
+                return pageLoader.Read(bigIndex);
+            }
+            finally
+            {
+                shapeLoader.Release();
+            }
+        }
+
+        public Cube FindStepHome(out SmartStep step)
+        {
+            int currentLevel = ReadLevel();
+            if (currentLevel==1)
+            {
+                step = null;
+                return this;
+            }
+            foreach (SmartStep nextStep in NormalShape.NextSteps)
+            {
+                Cube candidate=new Cube(this);
+                nextStep.DoAction(candidate);
+                int newLevel = candidate.ReadLevel();
+                if (newLevel<currentLevel)
+                {
+                    step = nextStep;
+                    return candidate;
+                }
+            }
+            throw new InvalidProgramException();
+        }
+
+        public Cube FindStepAway(out SmartStep step)
+        {
+            int currentLevel = ReadLevel();
+            if (currentLevel == 12)
+            {
+                step = null;
+                return this;
+            }
+            foreach (SmartStep nextStep in NormalShape.NextSteps)
+            {
+                Cube candidate = new Cube(this);
+                nextStep.DoAction(candidate);
+                int newLevel = candidate.ReadLevel();
+                if (newLevel > currentLevel)
+                {
+                    step = nextStep;
+                    return candidate;
+                }
+            }
+            // no way out
+            step = null;
+            return null;
         }
 
         #endregion
