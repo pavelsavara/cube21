@@ -196,9 +196,16 @@ namespace Zamboch.Cube21.Work
                 else
                 {
                     Shape sh = Database.shapeNormalizer[shapeBits];
-                    if (sh == normal)
+                    if (sh.IsNormal)
                     {
-                        normal.Alternatives.Add(step);
+                        if (sh == normal)
+                        {
+                            normal.Alternatives.Add(step);
+                        }
+                        else
+                        {
+                            throw new InvalidProgramException();
+                        }
                     }
                 }
             }

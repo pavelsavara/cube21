@@ -15,30 +15,98 @@ namespace Zamboch.Cube21
 
         public static void TestData()
         {
+            Cube c=new Cube();
+            c.Minimalize();
+            c.Minimalize();
+            c.Minimalize();
+            c.Minimalize();
+
+            c.RotateTop(6);
+            c.RotateBot(2);
+            c.Turn();
+            c.Normalize();
+            int ln = c.ReadLevel();
+            if (ln != 2)
+                throw new InvalidProgramException();
+            c.Minimalize();
+            c.Minimalize();
+            int lm = c.ReadLevel();
+            if (lm != 2)
+                throw new InvalidProgramException();
+            Test2();
+        }
+
+        private static void Test2()
+        {
             Random r = new Random();
             Cube cube=new Cube();
             int lastLevel = 1;
-            for (int i = 0; i < 1000; i++)
+            bool up = true;
+            for (int i = 0; i < 10000; i++)
             {
-                Cube next=new Cube(cube);
-                for (int t = 0; t < r.Next(6); t++)
-                {
-                    next.RotateNextTop();
-                }
-                for (int b = 0; b < r.Next(6); b++)
-                {
-                    next.RotateNextBot();
-                }
-                next.Turn();
-                int currentLevel = next.ReadLevel();
-                if (currentLevel != lastLevel + 1 && currentLevel != lastLevel - 1)
-                {
-                    next.WriteLevel(0xf);
-                    int level = next.ReadLevel();
-                    throw new InvalidProgramException();
-                }
+                int currentLevel;
+                Step s;
+                Cube next = RandomMove(cube, r, out s);
+                currentLevel = next.ReadLevel();
+                TestLevel(currentLevel, lastLevel, next);
                 lastLevel = currentLevel;
                 cube = next;
+
+                next = FindMove(cube, ref up);
+                currentLevel = next.ReadLevel();
+                TestLevel(currentLevel, lastLevel, next);
+                lastLevel = currentLevel;
+                cube = next;
+            
+            }
+        }
+
+        private static Cube FindMove(Cube cube, ref bool up)
+        {
+            Cube next;
+            if (up)
+            {
+                next = cube.FindStepAway();
+            }
+            else
+            {
+                next = cube.FindStepHome();
+            }
+            if (next == null || next == cube)
+            {
+                up = !up;
+                return cube;
+            }
+            else
+            {
+                return next;
+            }
+        }
+
+        private static Cube RandomMove(Cube cube, Random r, out Step s)
+        {
+            s=new Step();
+            Cube next=new Cube(cube);
+            for (int t = 0; t < r.Next(6); t++)
+            {
+                s.TopShift+=next.RotateNextTop();
+            }
+            for (int b = 0; b < r.Next(6); b++)
+            {
+                s.BotShift+=next.RotateNextBot();
+            }
+            next.Turn();
+            return next;
+        }
+
+        private static void TestLevel(int currentLevel, int lastLevel, Cube tested)
+        {
+            if (currentLevel != (lastLevel + 1) && 
+                currentLevel != (lastLevel - 1) && 
+                currentLevel != lastLevel)
+            {
+                int level = tested.ReadLevel();
+                throw new InvalidProgramException();
             }
         }
 

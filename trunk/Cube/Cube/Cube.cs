@@ -76,6 +76,28 @@ namespace Zamboch.Cube21
             }
         }
 
+        public uint BigBits
+        {
+            get
+            {
+                uint bigb;
+                uint smallb;
+                GetBits(out bigb, out smallb);
+                return bigb;
+            }
+        }
+
+        public uint SmallBits
+        {
+            get
+            {
+                uint bigb;
+                uint smallb;
+                GetBits(out bigb, out smallb);
+                return smallb;
+            }
+        }
+
         public int ShapeIndex
         {
             get { return Shape.ShapeIndex; }
@@ -146,29 +168,34 @@ namespace Zamboch.Cube21
             int bigIndex;
             int smallIndex;
             Cube best = this;
-            Correction bcorrection = null;
+            Correction bestCorrection = null;
             GetIndexes(out bigIndex, out smallIndex);
             foreach (Correction correction in NormalShape.Alternatives)
             {
-                Cube corr;
+                Cube candidate;
                 int bigIndexCorr;
                 int smallIndexCorr;
-                corr = new Cube(this);
-                correction.DoAction(corr);
+                candidate = new Cube(this);
+                correction.DoAction(candidate);
+#if DEBUG
+                if (candidate.Shape != Shape)
+                    throw new InvalidProgramException();
+#endif
+                candidate.GetIndexes(out bigIndexCorr, out smallIndexCorr);
 
-                corr.GetIndexes(out bigIndexCorr, out smallIndexCorr);
-
-                if (smallIndexCorr < smallIndex || bigIndexCorr < bigIndex)
+                if (smallIndexCorr < smallIndex || (
+                    smallIndexCorr <= smallIndex && bigIndexCorr < bigIndex))
                 {
                     bigIndex = bigIndexCorr;
                     smallIndex = smallIndexCorr;
-                    best = corr;
-                    bcorrection = correction;
+                    best = candidate;
+                    bestCorrection = correction;
                 }
             }
             top = best.top;
             bot = best.bot;
-            return bcorrection;
+            shape = null;
+            return bestCorrection;
         }
 
         public void RotateTop(int shift)
@@ -591,49 +618,57 @@ namespace Zamboch.Cube21
             }
         }
 
-        public Cube FindStepHome(out SmartStep step)
+        public Cube FindStepHome()
         {
-            int currentLevel = ReadLevel();
+            //out SmartStep step
+            Cube normal = new Cube(this);
+            normal.Normalize();
+            normal.Minimalize();
+            int currentLevel = normal.ReadLevel();
             if (currentLevel==1)
             {
-                step = null;
+                //step = null;
                 return this;
             }
             foreach (SmartStep nextStep in NormalShape.NextSteps)
             {
-                Cube candidate=new Cube(this);
+                Cube candidate = new Cube(normal);
                 nextStep.DoAction(candidate);
                 int newLevel = candidate.ReadLevel();
                 if (newLevel<currentLevel)
                 {
-                    step = nextStep;
+                    //step = nextStep;
                     return candidate;
                 }
             }
             throw new InvalidProgramException();
         }
 
-        public Cube FindStepAway(out SmartStep step)
+        public Cube FindStepAway()
         {
-            int currentLevel = ReadLevel();
+            Cube normal = new Cube(this);
+            normal.Normalize();
+            normal.Minimalize();
+            //out SmartStep step
+            int currentLevel = normal.ReadLevel();
             if (currentLevel == 12)
             {
-                step = null;
+                //step = null;
                 return this;
             }
             foreach (SmartStep nextStep in NormalShape.NextSteps)
             {
-                Cube candidate = new Cube(this);
+                Cube candidate = new Cube(normal);
                 nextStep.DoAction(candidate);
                 int newLevel = candidate.ReadLevel();
                 if (newLevel > currentLevel)
                 {
-                    step = nextStep;
+                    //step = nextStep;
                     return candidate;
                 }
             }
             // no way out
-            step = null;
+            //step = null;
             return null;
         }
 

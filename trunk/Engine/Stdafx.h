@@ -13,4 +13,4 @@
 #define managed_ror(val, shift) val=((val>>shift)|(val<<(32-shift)))
 #define managed_rol(val, shift) val=((val<<shift)|(val>>(32-shift)))
 
-#define min_cube(corrBigIndex, bigIndex, corrSmallIndex, smallIndex) if (corrBigIndex<bigIndex || corrSmallIndex<smallIndex) { bigIndex = corrBigIndex; smallIndex = corrSmallIndex; }
+#define min_cube(corrBigIndex, bigIndex, corrSmallIndex, smallIndex) if (corrSmallIndex < smallIndex || (corrSmallIndex <= smallIndex && corrBigIndex < bigIndex)) { bigIndex = corrBigIndex; smallIndex = corrSmallIndex; }

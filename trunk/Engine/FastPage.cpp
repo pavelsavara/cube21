@@ -3,6 +3,8 @@
 #include <vcclr.h>
 #include <intrin.h>
 
+#define zamoDBG 0
+
 #pragma unmanaged
 
 namespace Zamboch
@@ -15,8 +17,12 @@ namespace Zamboch
 
 			bool lWrite(byte* dataPtr, int offset, int level)
 			{
-				unsigned int shift=((offset&0x7))*4;
-				long* adrAligned=(long*)(((offset>>1) & 0xFFFFFFFC)+dataPtr);
+#if zamoDBG
+				byte b=dataPtr[offset>>1];
+#endif
+				unsigned int shift=(offset & 0x7) << 2;
+				unsigned int alignedOffset=(offset & 0xFFFFFFF8) >> 1;
+				long* adrAligned=(long*)(alignedOffset+dataPtr);
 
 				long dataOrig;
 				long data;
@@ -29,6 +35,23 @@ namespace Zamboch
 					data|=level<<shift;
 				}
 				while (dataOrig!=_InterlockedCompareExchange(adrAligned, data, dataOrig));
+#if zamoDBG
+				byte d=dataPtr[offset>>1];
+				if (offset&0x1)
+				{
+					if (b>>4!=0)
+						throw 1;
+					if (d>>4!=level)
+						throw 1;
+				}
+				else
+				{
+					if ((b&0xF)!=0)
+						throw 1;
+					if ((d&0xF)!=level)
+						throw 1;
+				}
+#endif
 				return true;
 			}
 

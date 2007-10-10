@@ -289,7 +289,7 @@ namespace Zamboch
 				        unsigned int bigSource=FastBigCubeRank::UnRank(sourceBigIndex);
 ");
             tw.Write(@"
-                        WriteAlternatedCubes{0}(bigSource, smallSource, hiLevel, dtpages, cntpages);", sourceShape.ShapeIndex);
+                        WriteAlternatedCubes{0}(bigSource, smallSource, lowLevel, dtpages, cntpages);", sourceShape.ShapeIndex);
 
             tw.Write(
                 @"
@@ -300,7 +300,7 @@ namespace Zamboch
 				        unsigned int bigSource=FastBigCubeRank::UnRank(sourceBigIndex);
 ");
             tw.Write(@"
-                        WriteAlternatedCubes{0}(bigSource, smallSource, lowLevel, dtpages, cntpages);", sourceShape.ShapeIndex);
+                        WriteAlternatedCubes{0}(bigSource, smallSource, hiLevel, dtpages, cntpages);", sourceShape.ShapeIndex);
             tw.WriteLine(@"
                     }
                 }
