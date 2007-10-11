@@ -672,6 +672,41 @@ namespace Zamboch.Cube21
             return null;
         }
 
+        public Cube FindRandomStepAway()
+        {
+            Cube normal = new Cube(this);
+            normal.Normalize();
+            normal.Minimalize();
+            //out SmartStep step
+            int currentLevel = normal.ReadLevel();
+            if (currentLevel == 12)
+            {
+                //step = null;
+                return this;
+            }
+            List<Cube> candidates=new List<Cube>();
+            //List<SmartStep> steps = new List<SmartStep>();
+            foreach (SmartStep nextStep in NormalShape.NextSteps)
+            {
+                Cube candidate = new Cube(normal);
+                nextStep.DoAction(candidate);
+                int newLevel = candidate.ReadLevel();
+                if (newLevel > currentLevel)
+                {
+                    //step = nextStep;
+                    candidates.Add(candidate);
+                }
+            }
+            if(candidates.Count>0)
+            {
+                Random r=new Random();
+                return candidates[r.Next(candidates.Count)];
+            }
+            // no way out
+            //step = null;
+            return null;
+        }
+
         #endregion
     }
 }

@@ -33,7 +33,15 @@ namespace Zamboch.Cube21
             int lm = c.ReadLevel();
             if (lm != 2)
                 throw new InvalidProgramException();
-            Test2();
+            try
+            {
+                Test2();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private static void Test2()
@@ -45,20 +53,25 @@ namespace Zamboch.Cube21
             for (int i = 0; i < 10000; i++)
             {
                 int currentLevel;
+                Cube next;
+                /*
                 Step s;
-                Cube next = RandomMove(cube, r, out s);
+                next = RandomMove(cube, r, out s);
                 currentLevel = next.ReadLevel();
                 TestLevel(currentLevel, lastLevel, next);
                 lastLevel = currentLevel;
                 cube = next;
+                 */
 
                 next = FindMove(cube, ref up);
                 currentLevel = next.ReadLevel();
                 TestLevel(currentLevel, lastLevel, next);
                 lastLevel = currentLevel;
                 cube = next;
-            
+
+                Console.WriteLine("{0:00} {1}", lastLevel, cube);
             }
+            Console.WriteLine("Test done");
         }
 
         private static Cube FindMove(Cube cube, ref bool up)
@@ -66,7 +79,7 @@ namespace Zamboch.Cube21
             Cube next;
             if (up)
             {
-                next = cube.FindStepAway();
+                next = cube.FindRandomStepAway();
             }
             else
             {

@@ -132,8 +132,11 @@ namespace Zamboch.Cube21
                     sw.Write("P{0:00}", shape.ParentShapeIndex);
                 sw.Write(" L");
                 sw.Write(shape.Level.ToString("0"));
-                sw.Write(" A{0:00}", shape.Alternatives.Count);
-                sw.Write(" [{1:00}&{2:00}] {0}", shape.Code, shape.TopPieces, shape.BotPieces);
+                if (shape.Alternatives.Count>0)
+                    sw.Write(" A{0:00}", shape.Alternatives.Count);
+                else
+                    sw.Write("    ");
+                sw.Write(" {1,2}+{2,-2} {0}", shape.Code, shape.TopPieces, shape.BotPieces);
                 sw.Write(" > ");
                 foreach (int shapeIndex in shape.AllTargetShapeIndexes)
                 {
