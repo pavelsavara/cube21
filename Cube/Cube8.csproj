@@ -1,0 +1,74 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A52B2183-1B1E-46F9-A392-DAF89656944F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cube8</RootNamespace>
+    <AssemblyName>Cube8</AssemblyName>
+    <StartupObject>Zamboch.Cube21.Test</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\Action.cs" />
+    <Compile Include="Actions\Correction.cs" />
+    <Compile Include="Actions\IAction.cs" />
+    <Compile Include="Actions\Path.cs" />
+    <Compile Include="Actions\SmartStep.cs" />
+    <Compile Include="Actions\Step.cs" />
+    <Compile Include="Cube\Cube.cs" />
+    <Compile Include="Cube\Piece.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ranking\CubeRank.cs" />
+    <Compile Include="Ranking\MultiRank.cs" />
+    <Compile Include="Ranking\Rank.cs" />
+    <Compile Include="Shapes\HalfShape.cs" />
+    <Compile Include="Shapes\NormalShape.cs" />
+    <Compile Include="Shapes\Page.cs" />
+    <Compile Include="Shapes\RotatedShape.cs" />
+    <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Test.cs" />
+    <Compile Include="Work\DatabaseManager.cs" />
+    <Compile Include="Work\DatabaseManagerBase.cs" />
+    <Compile Include="Work\Generator.cs" />
+    <Compile Include="Work\PageLoader.cs" />
+    <Compile Include="Work\ShapeLoader.cs" />
+    <Compile Include="Work\ShapePair.cs" />
+    <Compile Include="Work\WorkItem.cs" />
+    <Compile Include="Work\WorkQueue.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
