@@ -1,0 +1,87 @@
+﻿<Window x:Class="Viewer.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Window1" Height="446" Width="786">
+	<Grid Name="mainGrid">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="168.044*" />
+			<ColumnDefinition Width="109.956" />
+		</Grid.ColumnDefinitions>
+
+		<Border Grid.Column="1" Name="tools" Background="AliceBlue"/>
+		<Grid Grid.Column="0" Name="workspace">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="24" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="24" />
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0" Name="top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="0" Name="topBottomLeft" Focusable="False">&lt;-- Rotate Top Left</Button>
+				<Button Grid.Column="1" Name="topBottomReset" Focusable="False">Reset View</Button>
+				<Button Grid.Column="2" Name="topBottomRight" Focusable="False">Rotate Top Right --&gt;</Button>
+			</Grid>
+			<Grid Grid.Row="1" Name="mid" Background="White" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="32" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="32" />
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="0" Name="buttonFlip" Focusable="False">Flip</Button>
+				<Border Grid.Column="1" Name="CaptureBorder" Background="Transparent" >
+					<Viewport3D Name="mainViewport" ClipToBounds="True">
+
+						<Viewport3D.Camera>
+							<PerspectiveCamera
+								FarPlaneDistance="200"
+								Position="0,-30,40"
+								LookDirection="0, 30,-40"
+								UpDirection="0,1,0"
+								NearPlaneDistance="10"
+								x:Name="Camera"
+								FieldOfView="60" >
+							</PerspectiveCamera>
+						</Viewport3D.Camera>
+
+						<ModelVisual3D>
+							<ModelVisual3D.Content>
+								<DirectionalLight Color="DarkGray" Direction="0,-2,-4" />
+							</ModelVisual3D.Content>
+						</ModelVisual3D>
+						<ModelVisual3D>
+							<ModelVisual3D.Content>
+								<DirectionalLight Color="DarkGray" Direction="-4,0,-10" />
+							</ModelVisual3D.Content>
+						</ModelVisual3D>
+						<ModelVisual3D>
+							<ModelVisual3D.Content>
+								<DirectionalLight Color="DarkGray" Direction="+4,0,-10" />
+							</ModelVisual3D.Content>
+						</ModelVisual3D>
+						<ModelVisual3D>
+							<ModelVisual3D.Content>
+								<DirectionalLight Color="DarkGray" Direction="0,+4,-4" />
+							</ModelVisual3D.Content>
+						</ModelVisual3D>
+
+					</Viewport3D>
+				</Border>
+				<Button Grid.Column="2" Name="buttonTurn" Focusable="False">Turn</Button>
+			</Grid>
+			<Grid Grid.Row="2" Name="bottom">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<Button Grid.Column="0" Name="buttonBottomLeft" Focusable="False">&lt;-- Rotate Bottom Left</Button>
+				<Button Grid.Column="1" Name="buttonBottomReset" Focusable="False">Reset View</Button>
+				<Button Grid.Column="2" Name="buttonBottomRight" Focusable="False">Rotate Bottom Right --&gt;</Button>
+			</Grid>
+		</Grid>
+	</Grid>
+</Window>
