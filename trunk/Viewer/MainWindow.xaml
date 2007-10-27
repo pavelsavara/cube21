@@ -7,9 +7,15 @@
 			<ColumnDefinition Width="168.044*" />
 			<ColumnDefinition Width="109.956" />
 		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="22"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Menu Grid.Column="0" Grid.ColumnSpan="2" Height="22" Name="mainMenu" >
+		</Menu>
 
-		<Border Grid.Column="1" Name="tools" Background="AliceBlue"/>
-		<Grid Grid.Column="0" Name="workspace">
+		<Border Grid.Column="1" Grid.Row="1" Name="tools" Background="AliceBlue"/>
+		<Grid Grid.Column="0" Grid.Row="1" Name="workspace">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="24" />
 				<RowDefinition Height="*" />
@@ -21,9 +27,9 @@
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Name="topBottomLeft" Focusable="False">&lt;-- Rotate Top Left</Button>
-				<Button Grid.Column="1" Name="topBottomReset" Focusable="False">Reset View</Button>
-				<Button Grid.Column="2" Name="topBottomRight" Focusable="False">Rotate Top Right --&gt;</Button>
+				<Button Grid.Column="0" Name="buttonTopLeft" Focusable="False" Click="buttonTopLeft_Click">&lt;-- Rotate Top Left</Button>
+				<Button Grid.Column="1" Name="buttonTopReset" Focusable="False" Click="buttonTopReset_Click">Reset View</Button>
+				<Button Grid.Column="2" Name="buttonTopRight" Focusable="False" Click="topTopRight_Click">Rotate Top Right --&gt;</Button>
 			</Grid>
 			<Grid Grid.Row="1" Name="mid" Background="White" >
 				<Grid.ColumnDefinitions>
@@ -31,19 +37,19 @@
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="32" />
 				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Name="buttonFlip" Focusable="False">Flip</Button>
+				<Button Grid.Column="0" Name="buttonFlip" Focusable="False" Click="buttonFlip_Click">Flip</Button>
 				<Border Grid.Column="1" Name="CaptureBorder" Background="Transparent" >
 					<Viewport3D Name="mainViewport" ClipToBounds="True">
 
 						<Viewport3D.Camera>
 							<PerspectiveCamera
-								FarPlaneDistance="200"
-								Position="0,-30,40"
-								LookDirection="0, 30,-40"
+								FarPlaneDistance="100"
+								Position="0,-20,40"
+								LookDirection="0, 20,-40"
 								UpDirection="0,1,0"
 								NearPlaneDistance="10"
 								x:Name="Camera"
-								FieldOfView="60" >
+								FieldOfView="90" >
 							</PerspectiveCamera>
 						</Viewport3D.Camera>
 
@@ -70,7 +76,7 @@
 
 					</Viewport3D>
 				</Border>
-				<Button Grid.Column="2" Name="buttonTurn" Focusable="False">Turn</Button>
+				<Button Grid.Column="2" Name="buttonTurn" Focusable="False" Click="buttonTurn_Click">Turn</Button>
 			</Grid>
 			<Grid Grid.Row="2" Name="bottom">
 				<Grid.ColumnDefinitions>
@@ -78,9 +84,9 @@
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Name="buttonBottomLeft" Focusable="False">&lt;-- Rotate Bottom Left</Button>
-				<Button Grid.Column="1" Name="buttonBottomReset" Focusable="False">Reset View</Button>
-				<Button Grid.Column="2" Name="buttonBottomRight" Focusable="False">Rotate Bottom Right --&gt;</Button>
+				<Button Grid.Column="0" Name="buttonBottomLeft" Focusable="False" Click="buttonBottomLeft_Click">&lt;-- Rotate Bottom Left</Button>
+				<Button Grid.Column="1" Name="buttonBottomReset" Focusable="False" Click="buttonBottomReset_Click">Reset View</Button>
+				<Button Grid.Column="2" Name="buttonBottomRight" Focusable="False" Click="buttonBottomRight_Click">Rotate Bottom Right --&gt;</Button>
 			</Grid>
 		</Grid>
 	</Grid>

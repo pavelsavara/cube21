@@ -54,6 +54,22 @@ namespace Zamboch.Cube21
 
         #region Properties
 
+        public Piece[] TopPieces
+        {
+            get
+            {
+                return top;
+            }
+        }
+
+        public Piece[] BotPieces
+        {
+            get
+            {
+                return bot;
+            }
+        }
+
         public int SmallIndex
         {
             get
@@ -220,6 +236,20 @@ namespace Zamboch.Cube21
         public int RotateNextBot()
         {
             int shift = GetNext(bot);
+            RotateBot(shift);
+            return shift;
+        }
+
+        public int RotatePrevTop()
+        {
+            int shift = GetPrev(top);
+            RotateTop(shift);
+            return shift;
+        }
+
+        public int RotatePrevBot()
+        {
+            int shift = GetPrev(bot);
             RotateBot(shift);
             return shift;
         }
@@ -510,6 +540,18 @@ namespace Zamboch.Cube21
         private static int GetNext(Piece[] source)
         {
             for (int i = 1; i < 12; i++)
+            {
+                if (CheckTurn(i, source))
+                {
+                    return i;
+                }
+            }
+            throw new InvalidCubeException();
+        }
+
+        private static int GetPrev(Piece[] source)
+        {
+            for (int i = 11; i >= 1; i--)
             {
                 if (CheckTurn(i, source))
                 {

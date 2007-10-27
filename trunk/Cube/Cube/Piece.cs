@@ -30,6 +30,9 @@ namespace Zamboch.Cube21
         BBYY_D = 0xD,
         SBY1_E = 0xE,
         BBYS_F = 0xF,
+
+        MIDS_G = 0x10,
+        MIDY_H = 0x11,
     }
 
     // selection of small pieces without first bit
@@ -77,16 +80,20 @@ namespace Zamboch.Cube21
         BBYY = 'D',
         SBY1 = 'E',
         BBYS = 'F',
+
+        MIDS = 'G',
+        MIDY = 'H',
     }
 
     public static class PieceHelper
     {
-        private static Piece[] toPiece;
-        private static PieceChar[] toChar;
+        private static readonly Piece[] toPiece;
+        private static readonly PieceChar[] toChar;
+        private static readonly byte[] toColor;
 
         static PieceHelper()
         {
-            toPiece = new Piece['G'];
+            toPiece = new Piece['I'];
             toPiece['0'] = 0x0;
             toPiece['1'] = (Piece)0x1;
             toPiece['2'] = (Piece)0x2;
@@ -103,8 +110,10 @@ namespace Zamboch.Cube21
             toPiece['D'] = (Piece)0xD;
             toPiece['E'] = (Piece)0xE;
             toPiece['F'] = (Piece)0xF;
+            toPiece['G'] = (Piece)0x10;
+            toPiece['H'] = (Piece)0x11;
 
-            toChar = new PieceChar[16];
+            toChar = new PieceChar[18];
             toChar[0x0] = (PieceChar)'0';
             toChar[0x1] = (PieceChar)'1';
             toChar[0x2] = (PieceChar)'2';
@@ -121,6 +130,29 @@ namespace Zamboch.Cube21
             toChar[0xD] = (PieceChar)'D';
             toChar[0xE] = (PieceChar)'E';
             toChar[0xF] = (PieceChar)'F';
+            toChar[0x10] = (PieceChar)'G';
+            toChar[0x11] = (PieceChar)'H';
+
+            toColor = new byte[18];
+            toColor[0x0] = 0x0;
+            toColor[0x1] = 0x1;
+            toColor[0x2] = 0x2;
+            toColor[0x3] = 0x3;
+            toColor[0x4] = 0x4;
+            toColor[0x5] = 0x7;//
+            toColor[0x6] = 0x6;
+            toColor[0x7] = 0x5;//
+            
+            toColor[0x8] = 0x8;
+            toColor[0x9] = 0x9;
+            toColor[0xA] = 0xA;
+            toColor[0xB] = 0xD;//
+            toColor[0xC] = 0xC;
+            toColor[0xD] = 0xF;
+            toColor[0xE] = 0xE;
+            toColor[0xF] = 0xB;//
+            toColor[0x10] = 0x10;
+            toColor[0x11] = 0x11;
         }
 
         public static Piece ToPiece(PieceChar piece)
@@ -135,7 +167,37 @@ namespace Zamboch.Cube21
 
         public static bool IsBig(Piece piece)
         {
+            return (piece < Piece.MIDS_G) && ((int)piece & 0x1) == 0x1;
+        }
+
+        public static bool IsSmall(Piece piece)
+        {
+            return (piece < Piece.MIDS_G) && ((int)piece & 0x1) != 0x1;
+        }
+
+        public static bool IsMiddle(Piece piece)
+        {
+            return (piece >= Piece.MIDS_G);
+        }
+
+        public static bool IsMiddleYellow(Piece piece)
+        {
             return ((int)piece & 0x1) == 0x1;
+        }
+
+        public static bool IsTopYellow(Piece piece)
+        {
+            return ((int)piece & 0x8) == 0x8;
+        }
+
+        public static bool IsSideYellow(Piece piece)
+        {
+            return (toColor[(int)piece] & 0x4) == 0x4;
+        }
+
+        public static bool IsSide2Yellow(Piece piece)
+        {
+            return (toColor[(int)piece] & 0x2) == 0x2;
         }
 
         public static void ToForm(string form, out Piece[] top, out Piece[] bot)
