@@ -45,6 +45,11 @@
     <Compile Include="Actions\Action.cs" />
     <Compile Include="Actions\IAction.cs" />
     <Compile Include="Actions\Correction.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Shapes\HalfShape.cs" />
     <Compile Include="Work\DatabaseManagerBase.cs" />
     <Compile Include="Work\DatabaseManager.cs" />
@@ -70,6 +75,13 @@
     <Compile Include="Actions\Step.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Work\WorkQueue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Engine"
 	ProjectGUID="{FA0A6B73-7FA3-4B31-B062-3D4BA54FE570}"
 	RootNamespace="Engine"
@@ -195,6 +195,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{7AC8039F-9CD8-4E2A-BCFC-E9373B8981B3}"
+			RelativePathToProject=".\Cube\Cube.csproj"
 		/>
 		<AssemblyReference
 			RelativePath="System.Drawing.dll"

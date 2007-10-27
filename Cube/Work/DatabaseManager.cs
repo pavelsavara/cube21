@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Zamboch.Cube21.Properties;
 
 namespace Zamboch.Cube21.Work
 {
@@ -26,6 +27,14 @@ namespace Zamboch.Cube21.Work
         {
             get { return WorkQueue.ThisLevelWork; }
             set { WorkQueue.ThisLevelWork = value; }
+        }
+
+        public static string DatabasePath
+        {
+            get
+            {
+                return Settings.Default.DatabasePath;
+            }
         }
 
         public static int SourceLevel

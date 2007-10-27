@@ -19,7 +19,7 @@ namespace Zamboch.Cube21.Work
 
         public virtual String FileName
         {
-            get { return "Cube\\Shape" + ShapeIndex.ToString("00") + ".data"; }
+            get { return DatabaseManager.DatabasePath + "Shape" + ShapeIndex.ToString("00") + ".data"; }
         }
 
         public virtual bool IsLoaded
