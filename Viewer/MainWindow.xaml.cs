@@ -18,16 +18,24 @@ namespace Viewer
 
         private Trackball TrackBall = new Trackball();
         private Cube cube=new Cube();
-        private ModelVisual3D model;
+        private ModelVisual3D mainModel;
+        private ModelVisual3D backModel;
 
         private void InitCube()
         {
-            mainViewport.Children.Remove(model);
-            model = new ModelVisual3D();
-            model.Content = PiecesFactory.CreateCube(cube);
-            model.Transform = TrackBall.Transform;
+            mainViewport.Children.Remove(mainModel);
+            mainModel = new ModelVisual3D();
+            mainModel.Content = PiecesFactory.CreateCube(cube);
+            mainModel.Transform = TrackBall.Transform;
+            mainViewport.Children.Add(mainModel);
+
+            backViewport.Children.Remove(backModel);
+            backModel = new ModelVisual3D();
+            backModel.Content = PiecesFactory.CreateCube(cube);
+            backModel.Transform = TrackBall.Transform;
+            backViewport.Children.Add(backModel);
+
             TrackBall.EventSource = CaptureBorder;
-            mainViewport.Children.Add(model);
         }
 
 

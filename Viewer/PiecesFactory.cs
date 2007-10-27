@@ -120,8 +120,10 @@ namespace Viewer
 
         #region Constants
 
-        private const double o1 = 0.05;
+        private const double o1 = 0.01;
         private const double o2 = 0.3;
+        private const double os = 2.6;
+        private const double ob = 1.2;
 
         private const double z0 = 3.33;//0.0;
         private const double z1 = 6.66;
@@ -166,7 +168,7 @@ namespace Viewer
             MeshGeometry3D geometry = new MeshGeometry3D();
             top.Geometry = geometry;
 
-            Point3D p3 = new Point3D(y0, y0 + o2, z3);
+            Point3D p3 = new Point3D(y0, y0 + o2 * os, z3);
             Point3D p4 = new Point3D(y1 - o2, y2 - o2, z3);
             Point3D p5 = new Point3D(-y1 + o2, y2 - o2, z3);
 
@@ -275,7 +277,7 @@ namespace Viewer
             MeshGeometry3D geometry = new MeshGeometry3D();
             top.Geometry = geometry;
 
-            Point3D p0 = new Point3D(y0 + o2, y0 + o2, z3);
+            Point3D p0 = new Point3D(y0 + o2 * ob, y0 + o2 * ob, z3);
             Point3D p1 = new Point3D(y2 - o2, y1 + o2, z3);
             Point3D p2 = new Point3D(y1 + o2, y2 - o2, z3);
             Point3D p3 = new Point3D(y2 - o2, y2 - o2, z3);
