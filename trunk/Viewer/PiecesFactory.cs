@@ -125,7 +125,7 @@ namespace Viewer
 
         private const double z0 = 3.33;//0.0;
         private const double z1 = 6.66;
-        private const double z3 = z0+z1;
+        private const double z3 = z0 + z1;
 
         private const double y0 = 0.0;
         private const double y1 = 2.68;
@@ -133,6 +133,7 @@ namespace Viewer
         private static readonly Color white = Colors.White;
         private static readonly Color yellow = Colors.Yellow;
         private static readonly Color inside = Colors.Black;
+        private static readonly Color names = Colors.DarkBlue;
 
         #endregion
 
@@ -172,7 +173,7 @@ namespace Viewer
             AddTriangle(geometry, p5, p3, p4);
                 
             TextBlock textBlock = new TextBlock();
-            textBlock.Foreground = new SolidColorBrush(Colors.Red);
+            textBlock.Foreground = new SolidColorBrush(names);
             if (topYellow)
                 textBlock.Background = new SolidColorBrush(yellow);
             else
@@ -284,7 +285,7 @@ namespace Viewer
 
 
             TextBlock textBlock = new TextBlock();
-            textBlock.Foreground = new SolidColorBrush(Colors.Red);
+            textBlock.Foreground = new SolidColorBrush(names);
             if (topYellow)
                 textBlock.Background = new SolidColorBrush(yellow);
             else
