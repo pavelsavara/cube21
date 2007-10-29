@@ -77,6 +77,7 @@ namespace _3DTools
             _transform = new Transform3DGroup();
             _transform.Children.Add(_scale);
             _transform.Children.Add(new RotateTransform3D(_rotation));
+            _rotation.Axis = new Vector3D(0, 0, 1);
         }
 
         public void Reset()
@@ -84,7 +85,7 @@ namespace _3DTools
             _scale.ScaleX = 1;
             _scale.ScaleY = 1;
             _scale.ScaleZ = 1;
-            _rotation.Axis=new Vector3D(0,1,0);
+            _rotation.Axis=new Vector3D(0,0,1);
             _rotation.Angle = 0;
             _previousPosition3D = new Vector3D(0, -0.2, 1);
         }
@@ -114,6 +115,7 @@ namespace _3DTools
                     _eventSource.MouseDown -= this.OnMouseDown;
                     _eventSource.MouseUp -= this.OnMouseUp;
                     _eventSource.MouseMove -= this.OnMouseMove;
+                    _eventSource.MouseWheel -= this.OnMouseWheel;
                 }
 
                 _eventSource = value;
@@ -121,7 +123,13 @@ namespace _3DTools
                 _eventSource.MouseDown += this.OnMouseDown;
                 _eventSource.MouseUp += this.OnMouseUp;
                 _eventSource.MouseMove += this.OnMouseMove;
+                _eventSource.MouseWheel += this.OnMouseWheel;
             }
+        }
+
+        private void OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            _rotation.Angle += (e.Delta/10);
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
@@ -165,6 +173,8 @@ namespace _3DTools
 
             Vector3D axis = Vector3D.CrossProduct(_previousPosition3D, currentPosition3D);
             double angle = Vector3D.AngleBetween(_previousPosition3D, currentPosition3D);
+            if (axis.X==0 && axis.Y==0 && axis.Z==0)
+                return;
             Quaternion delta = new Quaternion(axis, -angle);
 
             // Get the current orientantion from the RotateTransform3D

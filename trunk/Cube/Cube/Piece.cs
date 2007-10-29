@@ -148,9 +148,10 @@ namespace Zamboch.Cube21
             toColor[0xA] = 0xA;
             toColor[0xB] = 0xD;//
             toColor[0xC] = 0xC;
-            toColor[0xD] = 0xF;
+            toColor[0xD] = 0xF;//
             toColor[0xE] = 0xE;
             toColor[0xF] = 0xB;//
+
             toColor[0x10] = 0x10;
             toColor[0x11] = 0x11;
         }
