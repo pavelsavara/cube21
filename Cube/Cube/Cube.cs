@@ -157,6 +157,26 @@ namespace Zamboch.Cube21
             }
         }
 
+        public int NextTop
+        {
+            get { return GetNext(top); }
+        }
+
+        public int NextBot
+        {
+            get { return GetNext(bot); }
+        }
+
+        public int PrevTop
+        {
+            get { return GetPrev(top); }
+        }
+
+        public int PrevBot
+        {
+            get { return GetPrev(bot); }
+        }
+
         #endregion
 
         #region Active Operations

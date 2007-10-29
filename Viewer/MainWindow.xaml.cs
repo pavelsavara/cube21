@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
 using _3DTools;
 using Zamboch.Cube21;
@@ -13,31 +14,16 @@ namespace Viewer
         public MainWindow()
         {
             InitializeComponent();
-            InitCube();
-        }
-
-        private Trackball TrackBall = new Trackball();
-        private Cube cube=new Cube();
-        private ModelVisual3D mainModel;
-        private ModelVisual3D backModel;
-
-        private void InitCube()
-        {
-            mainViewport.Children.Remove(mainModel);
-            mainModel = new ModelVisual3D();
-            mainModel.Content = PiecesFactory.CreateCube(cube);
-            mainModel.Transform = TrackBall.Transform;
-            mainViewport.Children.Add(mainModel);
-
-            backViewport.Children.Remove(backModel);
-            backModel = new ModelVisual3D();
-            backModel.Content = PiecesFactory.CreateCube(cube);
-            backModel.Transform = TrackBall.Transform;
-            backViewport.Children.Add(backModel);
-
+            cube = new VisualCube(new Cube());
+            mainViewport.Children.Add(cube.FrontModel);
+            backViewport.Children.Add(cube.BackModel);
+            cube.FrontModel.Transform = TrackBall.Transform;
+            cube.BackModel.Transform = TrackBall.Transform;
             TrackBall.EventSource = CaptureBorder;
         }
 
+        private Trackball TrackBall = new Trackball();
+        private VisualCube cube;
 
         private void buttonTopReset_Click(object sender, RoutedEventArgs e)
         {
@@ -53,37 +39,31 @@ namespace Viewer
         private void buttonFlip_Click(object sender, RoutedEventArgs e)
         {
             cube.Flip();
-            InitCube();
         }
 
         private void buttonTurn_Click(object sender, RoutedEventArgs e)
         {
             cube.Turn();
-            InitCube();
         }
 
         private void buttonBottomRight_Click(object sender, RoutedEventArgs e)
         {
             cube.RotateNextBot();
-            InitCube();
         }
 
         private void topTopRight_Click(object sender, RoutedEventArgs e)
         {
             cube.RotateNextTop();
-            InitCube();
         }
 
         private void buttonBottomLeft_Click(object sender, RoutedEventArgs e)
         {
             cube.RotatePrevBot();
-            InitCube();
         }
 
         private void buttonTopLeft_Click(object sender, RoutedEventArgs e)
         {
             cube.RotatePrevTop();
-            InitCube();
         }
     }
 }
