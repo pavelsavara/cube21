@@ -13,47 +13,60 @@ namespace Viewer
             Cube = new Cube(sourceCube);
             FrontModel = new ModelVisual3D();
             BackModel = new ModelVisual3D();
-            RefreshCube();
+            CreateCube();
         }
 
         #region Public methods
 
         public void Flip()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             Cube.Flip();
             MiddleLeft = !MiddleLeft;
             MiddleRight = !MiddleRight;
-            RefreshCube();
+            AnimateTurnRight();
+            AnimateTurnLeft();
         }
 
 
         public void Turn()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             Cube.Turn();
             MiddleRight = !MiddleRight;
-            AnimateTurn();
+            AnimateTurnRight();
         }
 
         public void RotateNextBot()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             int shift = Cube.RotateNextBot();
             AnimateBot(shift);
         }
 
         public void RotatePrevBot()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             int shift = Cube.RotatePrevBot();
             AnimateBot(shift);
         }
 
         public void RotateNextTop()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             int shift = Cube.RotateNextTop();
             AnimateTop(shift);
         }
 
         public void RotatePrevTop()
         {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
             int shift = Cube.RotatePrevTop();
             AnimateTop(shift);
         }
@@ -62,7 +75,7 @@ namespace Viewer
 
         #region Helpers
 
-        private void AnimateTurn()
+        private void AnimateTurnRight()
         {
             for (int position = 0; position < 6; position++)
             {
@@ -78,6 +91,26 @@ namespace Viewer
                 if (PieceHelper.IsBig(piece))
                     position++;
             }
+            AnimateFlip(MiddleRight ? 13 : 0, Piece.MIDS_G);
+        }
+
+        private void AnimateTurnLeft()
+        {
+            for (int position = 6; position < 12; position++)
+            {
+                Piece piece = Cube.TopPieces[position];
+                AnimateFlip(position, piece);
+                if (PieceHelper.IsBig(piece))
+                    position++;
+            }
+            for (int position = 6; position < 12; position++)
+            {
+                Piece piece = Cube.BotPieces[position];
+                AnimateFlip(position + 12, piece);
+                if (PieceHelper.IsBig(piece))
+                    position++;
+            }
+            AnimateFlip(MiddleLeft ? 19 : 6, Piece.MIDY_H);
         }
 
         private void AnimateFlip(int position, Piece piece)
@@ -91,8 +124,10 @@ namespace Viewer
             if (prevAngle ==0)
                 prevAngle = 360;
 
-            Duration duration = new Duration(new TimeSpan(0, 0, 0, 0, 3000));
+            Duration duration = new Duration(new TimeSpan(0, 0, 0, 0, 300));
             DoubleAnimation flipAnimation = new DoubleAnimation(prevAngle, nextAngle, duration);
+            flipAnimation.Completed += OnAnimationCompleted;
+            movementsCount++;
             flip.BeginAnimation(AxisAngleRotation3D.AngleProperty, flipAnimation);
         }
 
@@ -144,10 +179,24 @@ namespace Viewer
 
             Duration duration = new Duration(new TimeSpan(0, 0, 0, 0, Math.Abs(shift) * 90));
             DoubleAnimation rotationAnimation = new DoubleAnimation(prevAngle, nextAngle, duration);
+            rotationAnimation.Completed += OnAnimationCompleted;
+            movementsCount++;
             rotation.BeginAnimation(AxisAngleRotation3D.AngleProperty, rotationAnimation);
         }
 
-        private void RefreshCube()
+        void OnAnimationCompleted(object sender, EventArgs e)
+        {
+            bool call;
+            lock(this)
+            {
+                movementsCount--;
+                call = (movementsCount == 0);
+            }
+            if (call && OnAfterAnimation!=null)
+                OnAfterAnimation();
+        }
+
+        private void CreateCube()
         {
             content = new Model3DGroup();
             for (int position = 0; position < 12; position++)
@@ -269,6 +318,11 @@ namespace Viewer
         private readonly AxisAngleRotation3D[] rotations=new AxisAngleRotation3D[18];
         private readonly AxisAngleRotation3D[] flips = new AxisAngleRotation3D[18];
         private Model3DGroup content;
+        private int movementsCount;
+
+        public delegate void RefreshButtons();
+        public event RefreshButtons OnAfterAnimation;
+        public event RefreshButtons OnBeforeAnimation;
 
         public ModelVisual3D FrontModel;
         public ModelVisual3D BackModel;
