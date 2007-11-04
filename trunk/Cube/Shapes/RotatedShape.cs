@@ -15,5 +15,16 @@ namespace Zamboch.Cube21
         public NormalShape NormalShape;
 
         public Correction FromNormalStep;
+        
+        [XmlIgnore]
+        public Correction ToNormalStep
+        {
+            get
+            {
+                Correction inversion = new Correction(FromNormalStep);
+                inversion.Invert();
+                return inversion;
+            }
+        }
     }
 }

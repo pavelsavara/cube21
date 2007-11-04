@@ -23,7 +23,7 @@ namespace Zamboch.Cube21.Work
 
         #region Construction
 
-        private WorkItem()
+        protected WorkItem()
         {
         }
 

@@ -9,6 +9,5 @@ namespace Zamboch.Cube21.Actions
         void DumpActionEx(Cube exampleCube, string prefix, TextWriter tw);
         void UndoAction(Cube cube);
         IAction Copy();
-        void Invert();
     }
 }

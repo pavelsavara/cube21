@@ -18,16 +18,19 @@ namespace Zamboch
 				{
 					DatabaseExt^ manager = gcnew DatabaseExt();
 		            manager->Initialize();
-					//DatabaseManager::Database->IsLocal = true;
-					Test::TestData();
+					DatabaseManager::Database->IsLocal = true;
+					//Test::TestData();
 					manager->Database->DumpShapes();
-					/*if (manager->Explore())
+					if (manager->Explore())
 					{
+						/*
 						if (manager->FillGaps())
 						{
-							Test::TestData();
+							Test::TestData(12, 10000);
 						}
-					}*/
+						*/
+						Test::TestData(12, 10000);
+					}
 				}
 
 				virtual Zamboch::Cube21::Work::PageLoader^ CreatePageLoder(Page^ page) override

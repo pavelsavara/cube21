@@ -10,32 +10,36 @@ namespace Zamboch.Cube21
         {
             DatabaseManager manager = new DatabaseManager();
             manager.Initialize();
-            Generator.Dump();
+            //Generator.Dump();
+            if (Database.instance.IsExplored)
+            {
+                TestData(12, 10000);
+            }
         }
 
-        public static void TestData()
+        public static void TestData(int maxLevel, int count)
         {
-            Cube c=new Cube();
-            c.Minimalize();
-            c.Minimalize();
-            c.Minimalize();
-            c.Minimalize();
-
-            c.RotateTop(6);
-            c.RotateBot(2);
-            c.Turn();
-            c.Normalize();
-            int ln = c.ReadLevel();
-            if (ln != 2)
-                throw new InvalidProgramException();
-            c.Minimalize();
-            c.Minimalize();
-            int lm = c.ReadLevel();
-            if (lm != 2)
-                throw new InvalidProgramException();
             try
             {
-                Test2();
+                Cube c = new Cube();
+                c.Minimalize();
+                c.Minimalize();
+                c.Minimalize();
+                c.Minimalize();
+
+                c.RotateTop(6);
+                c.RotateBot(2);
+                c.Turn();
+                c.Normalize();
+                int ln = c.ReadLevel();
+                if (ln != 2)
+                    throw new InvalidProgramException();
+                c.Minimalize();
+                c.Minimalize();
+                int lm = c.ReadLevel();
+                if (lm != 2)
+                    throw new InvalidProgramException();
+                TestLevel(maxLevel, count);
             }
             catch(Exception e)
             {
@@ -44,56 +48,40 @@ namespace Zamboch.Cube21
             }
         }
 
-        private static void Test2()
+        private static void TestLevel(int maxLevel, int count)
         {
             Random r = new Random();
             Cube cube=new Cube();
             int lastLevel = 1;
             bool up = true;
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < count; i++)
             {
+                Cube next = new Cube(cube);
+                SmartStep step = cube.FindRandomStep(r, up);
+                if (step==null)
+                {
+                    up = false;
+                }
+                else
+                {
+                    step.DoAction(next);
+                }
+
                 int currentLevel;
-                Cube next;
-                /*
-                Step s;
-                next = RandomMove(cube, r, out s);
-                currentLevel = next.ReadLevel();
-                TestLevel(currentLevel, lastLevel, next);
-                lastLevel = currentLevel;
-                cube = next;
-                 */
-
-                next = FindMove(cube, ref up);
                 currentLevel = next.ReadLevel();
                 TestLevel(currentLevel, lastLevel, next);
                 lastLevel = currentLevel;
                 cube = next;
 
-                Console.WriteLine("{0:00} {1}", lastLevel, cube);
+                //Console.WriteLine("{0:00} {1}", lastLevel, cube);
+
+                if (lastLevel == 1)
+                    up = true;
+                if (lastLevel == maxLevel)
+                    up = false;
+
             }
             Console.WriteLine("Test done");
-        }
-
-        private static Cube FindMove(Cube cube, ref bool up)
-        {
-            Cube next;
-            if (up)
-            {
-                next = cube.FindRandomStepAway();
-            }
-            else
-            {
-                next = cube.FindStepHome();
-            }
-            if (next == null || next == cube)
-            {
-                up = !up;
-                return cube;
-            }
-            else
-            {
-                return next;
-            }
         }
 
         private static Cube RandomMove(Cube cube, Random r, out Step s)

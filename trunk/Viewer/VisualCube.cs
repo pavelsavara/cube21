@@ -284,10 +284,6 @@ namespace Viewer
                     rotationAngle = (angle + 180);
                 else
                     rotationAngle = (330 - angle);
-                /*if (top)
-                    rotationAngle = (angle + 180) % 360;
-                else
-                    rotationAngle = (angle) % 360;*/
             }
             else if (PieceHelper.IsBig(piece))
             {
@@ -295,10 +291,6 @@ namespace Viewer
                     rotationAngle = (angle + 240);
                 else
                     rotationAngle = (360 - angle);
-                /*if (top)
-                    rotationAngle = (angle + 240) % 360;
-                else
-                    rotationAngle = (angle + 330) % 360;*/
             }
             else if (PieceHelper.IsMiddle(piece))
             {

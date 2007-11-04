@@ -38,30 +38,23 @@ namespace Zamboch.Cube21.Actions
 
         public override void DoAction(Cube cube)
         {
-            if (Reverse)
-                cube.Turn();
             base.DoAction(cube);
-            if (!Reverse)
-                cube.Turn();
+            cube.Turn();
         }
 
         public override void DumpAction(Cube exampleCube, string cubeName, TextWriter tw)
         {
-            if (Reverse)
-                tw.WriteLine(@"                {0}Turn();", cubeName);
             base.DumpAction(exampleCube, cubeName, tw);
-            if (!Reverse)
-                tw.WriteLine(@"                {0}Turn();", cubeName);
+            tw.WriteLine(@"                {0}Turn();", cubeName);
         }
 
         public override void UndoAction(Cube cube)
         {
-            if (!Reverse)
-                cube.Turn();
             base.UndoAction(cube);
-            if (Reverse)
-                cube.Turn();
+            cube.Turn();
         }
+
+
 
         #endregion
 
@@ -69,18 +62,12 @@ namespace Zamboch.Cube21.Actions
 
         public override string ToString()
         {
-            if (Reverse)
-                return '/' + base.ToString();
-            else
-                return base.ToString() + '/';
+            return base.ToString() + '/';
         }
 
         public override string ToStringEx()
         {
-            if (Reverse)
-                return 'T' + base.ToStringEx();
-            else
-                return base.ToStringEx() + 'T';
+            return base.ToStringEx() + 'T';
         }
 
         #endregion

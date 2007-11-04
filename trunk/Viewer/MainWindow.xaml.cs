@@ -1,8 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Media3D;
+﻿using System.Text;
+using System.Windows;
 using _3DTools;
 using Zamboch.Cube21;
+using Zamboch.Cube21.Work;
 
 namespace Viewer
 {
@@ -11,8 +11,12 @@ namespace Viewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Construction
+
         public MainWindow()
         {
+            DatabaseManager m=new DatabaseManager();
+            m.Initialize();
             InitializeComponent();
             cube = new VisualCube(new Cube());
             mainViewport.Children.Add(cube.FrontModel);
@@ -20,13 +24,27 @@ namespace Viewer
             cube.FrontModel.Transform = TrackBall.Transform;
             cube.BackModel.Transform = TrackBall.Transform;
             TrackBall.EventSource = CaptureBorder;
-            cube.OnBeforeAnimation += BeforeAnimation;
-            cube.OnAfterAnimation += AfterAnimation;
-            textBlockInfo.Text = cube.Cube.ToString();
+            cube.OnBeforeAnimation += OnBeforeAnimation;
+            cube.OnAfterAnimation += OnAfterAnimation;
+            DumpInfo();
         }
 
-        private Trackball TrackBall = new Trackball();
-        private VisualCube cube;
+        #endregion
+
+        #region Helpers
+
+        private void DumpInfo()
+        {
+            StringBuilder sb=new StringBuilder();
+            sb.Append(cube.Cube.ToString());
+            sb.Append("\n");
+            sb.Append(cube.Cube.NormalShape.ToString());
+            textBlockInfo.Text = sb.ToString(); 
+        }
+
+        #endregion
+
+        #region Events
 
         private void buttonTopReset_Click(object sender, RoutedEventArgs e)
         {
@@ -74,31 +92,25 @@ namespace Viewer
             cube.RotatePrevTop();
         }
 
-        private void AfterAnimation()
+        private void OnAfterAnimation()
         {
-            //RefreshButtons(true);
             buttonsEnabled = true;
-            textBlockInfo.Text = cube.Cube.ToString();
+            DumpInfo();
         }
 
-        private void BeforeAnimation()
+        private void OnBeforeAnimation()
         {
-            //RefreshButtons(false);
             buttonsEnabled = false;
         }
 
-        private bool buttonsEnabled = true;
+        #endregion
 
-        private void RefreshButtons(bool enabled)
-        {
-            buttonTopLeft.IsEnabled = enabled;
-            buttonTopReset.IsEnabled = enabled;
-            buttonTopRight.IsEnabled = enabled;
-            buttonBottomLeft.IsEnabled = enabled;
-            buttonBottomReset.IsEnabled = enabled;
-            buttonBottomRight.IsEnabled = enabled;
-            buttonFlip.IsEnabled = enabled;
-            buttonTurn.IsEnabled = enabled;
-        }
+        #region Variables
+
+        private bool buttonsEnabled = true;
+        private Trackball TrackBall = new Trackball();
+        private VisualCube cube;
+
+        #endregion
     }
 }
