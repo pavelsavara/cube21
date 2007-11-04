@@ -16,7 +16,13 @@ namespace Zamboch.Cube21.Work
         #region Helpers
 
         private static readonly XmlSerializer databaseSerializer = new XmlSerializer(typeof(WorkQueue));
-        private static readonly string workFile = @"Cube\Work.xml";
+        public static string workFile
+        {
+            get
+            {
+                return Path.Combine(DatabaseManager.DatabasePath, "Work.xml");
+            }
+        }
 
         #endregion
 

@@ -40,8 +40,23 @@ namespace Zamboch.Cube21
 
         public static Dictionary<uint, HalfShape> halfShapeNormalizer = new Dictionary<uint, HalfShape>();
 
-        private static readonly string databaseFile = @"Cube\Database.xml";
-        private static readonly string reportFile = @"Cube\Report.txt";
+
+        private static String databaseFile
+        {
+            get
+            {
+                return System.IO.Path.Combine(DatabaseManager.DatabasePath, "Database.xml");
+            }
+        }
+
+        private static String reportFile
+        {
+            get
+            {
+                return System.IO.Path.Combine(DatabaseManager.DatabasePath, "Report.txt");
+            }
+        }
+        
         public const int ShapesCount = 90;
 
         #endregion

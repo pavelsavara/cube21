@@ -14,10 +14,6 @@ namespace Zamboch.Cube21.Actions
     {
         #region Data
 
-        //T=Flip before shifts (default F) (reverse order)
-        [XmlAttribute("Rev")]
-        public bool Reverse;
-
         [XmlAttribute("Top")]
         public int TopShift;
 
@@ -51,13 +47,6 @@ namespace Zamboch.Cube21.Actions
         #endregion
 
         #region Public methods
-
-        public virtual void Invert()
-        {
-            Reverse = !Reverse;
-            TopShift = (144 - TopShift) % 12;
-            BotShift = (144 - BotShift) % 12;
-        }
 
         public void Normalize()
         {

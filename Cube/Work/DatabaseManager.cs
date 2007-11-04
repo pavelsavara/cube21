@@ -210,6 +210,7 @@ namespace Zamboch.Cube21.Work
                 {
                     break;
                 }
+                Test.TestData(SourceLevel, 10000);
                 /*
                 if (SourceLevel == 4)
                 {
@@ -235,6 +236,7 @@ namespace Zamboch.Cube21.Work
                 }
 
                 Save();
+                Test.TestData(SourceLevel, 100);
                 GC.Collect();
             }
             return true;

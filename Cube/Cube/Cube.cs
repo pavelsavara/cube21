@@ -186,14 +186,11 @@ namespace Zamboch.Cube21
             if (Shape.IsNormal)
                 return null;
             RotatedShape rs = (RotatedShape)Shape;
-            Correction correction = rs.FromNormalStep;
-            Correction invert = (Correction)correction.Copy();
-            invert.Invert();
-            invert.DoAction(this);
+            rs.ToNormalStep.DoAction(this);
 #if DEBUG
             CheckFlipable();
 #endif
-            return invert;
+            return rs.ToNormalStep;
         }
 
         public Correction Minimalize()
@@ -586,14 +583,18 @@ namespace Zamboch.Cube21
             shift = (shift + 144) % 12;
             if (shift == 0)
                 return source;
+#if DEBUG
             if (!CheckTurn(shift, source))
                 throw new NonFlipableCubeException();
+#endif
             Piece[] temp = new Piece[12];
             int rest = 12 - shift;
             Array.Copy(source, 0, temp, shift, rest);
             Array.Copy(source, rest, temp, 0, shift);
+#if DEBUG
             if (!CheckTurn(0, temp))
                 throw new NonFlipableCubeException();
+#endif
             return temp;
         }
 
@@ -680,93 +681,88 @@ namespace Zamboch.Cube21
             }
         }
 
-        public Cube FindStepHome()
+        public Path FindWayHome()
         {
-            //out SmartStep step
-            Cube normal = new Cube(this);
-            normal.Normalize();
-            normal.Minimalize();
-            int currentLevel = normal.ReadLevel();
-            if (currentLevel==1)
-            {
-                //step = null;
-                return this;
-            }
-            foreach (SmartStep nextStep in NormalShape.NextSteps)
-            {
-                Cube candidate = new Cube(normal);
-                nextStep.DoAction(candidate);
-                int newLevel = candidate.ReadLevel();
-                if (newLevel<currentLevel)
-                {
-                    //step = nextStep;
-                    return candidate;
-                }
-            }
-            throw new InvalidProgramException();
+            //Path path=new Path();
+            //return path;
+            throw new NotImplementedException();
         }
 
-        public Cube FindStepAway()
+        public SmartStep FindStepHome()
         {
-            Cube normal = new Cube(this);
-            normal.Normalize();
-            normal.Minimalize();
-            //out SmartStep step
-            int currentLevel = normal.ReadLevel();
-            if (currentLevel == 12)
-            {
-                //step = null;
-                return this;
-            }
-            foreach (SmartStep nextStep in NormalShape.NextSteps)
-            {
-                Cube candidate = new Cube(normal);
-                nextStep.DoAction(candidate);
-                int newLevel = candidate.ReadLevel();
-                if (newLevel > currentLevel)
-                {
-                    //step = nextStep;
-                    return candidate;
-                }
-            }
-            // no way out
-            //step = null;
-            return null;
+            List<SmartStep> steps = FindSteps(false, true);
+            if (steps == null || steps.Count == 0)
+                return null;
+            return steps[0];
         }
 
-        public Cube FindRandomStepAway()
+        public SmartStep FindStepAway()
         {
-            Cube normal = new Cube(this);
-            normal.Normalize();
-            normal.Minimalize();
-            //out SmartStep step
+            List<SmartStep> steps = FindSteps(true, true);
+            if (steps == null || steps.Count == 0)
+                return null;
+            return steps[0];
+        }
+
+        public SmartStep FindRandomStep(Random random, bool away)
+        {
+            List<SmartStep> steps = FindSteps(away, false);
+            if (steps == null || steps.Count == 0)
+                return null;
+            return steps[random.Next(steps.Count)];
+        }
+
+        public List<SmartStep> FindSteps(bool away, bool first)
+        {
+            Cube normal=new Cube(this);
+            Correction normalize = normal.Normalize();
+            Correction minimalize = normal.Minimalize();
+
             int currentLevel = normal.ReadLevel();
-            if (currentLevel == 12)
+            if (!away && currentLevel == 1)
             {
-                //step = null;
-                return this;
+                return null;
             }
-            List<Cube> candidates=new List<Cube>();
-            //List<SmartStep> steps = new List<SmartStep>();
+            if (away && currentLevel == 12)
+            {
+                return null;
+            }
+            List<SmartStep> solutions=new List<SmartStep>();
             foreach (SmartStep nextStep in NormalShape.NextSteps)
             {
                 Cube candidate = new Cube(normal);
                 nextStep.DoAction(candidate);
                 int newLevel = candidate.ReadLevel();
-                if (newLevel > currentLevel)
+                if (newLevel==0)
                 {
-                    //step = nextStep;
-                    candidates.Add(candidate);
+                    if (Database.instance.IsExplored)
+                        throw new InvalidProgramException();
+                }
+                else
+                {
+                    if ((away && newLevel > currentLevel) ||
+                        (!away && newLevel < currentLevel))
+                    {
+                        SmartStep step = normalize + minimalize + nextStep;
+#if DEBUG
+                        Cube test=new Cube(this);
+                        step.DoAction(test);
+                        if (!test.Equals(candidate))
+                        {
+                            SmartStep step2 = normalize + minimalize + nextStep;
+                            Cube test2 = new Cube(this);
+                            step2.DoAction(test2);
+                            throw new InvalidProgramException();
+                        }
+#endif
+
+                        solutions.Add(step);
+                        if (first)
+                            return solutions;
+                    }
                 }
             }
-            if(candidates.Count>0)
-            {
-                Random r=new Random();
-                return candidates[r.Next(candidates.Count)];
-            }
-            // no way out
-            //step = null;
-            return null;
+            return solutions;
         }
 
         #endregion

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,14 +12,7 @@ namespace Zamboch.Cube21.Actions
 
         public Path Invert()
         {
-            Path res = new Path();
-            for (int i = Count - 1; i >= 0; i--)
-            {
-                IAction inv = this[i].Copy();
-                inv.Invert();
-                res.Add(inv);
-            }
-            return res;
+            throw new NotImplementedException();
         }
 
         public Path(Action action)

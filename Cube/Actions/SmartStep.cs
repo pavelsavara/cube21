@@ -26,7 +26,7 @@ namespace Zamboch.Cube21.Actions
         {
             TargetShapeIndex = source.TargetShapeIndex;
             Step = (Step)source.Step.Copy();
-            if (Correction != null)
+            if (source.Correction != null)
                 Correction = (Correction)source.Correction.Copy();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Zamboch.Cube21.Work
 {
@@ -19,7 +20,10 @@ namespace Zamboch.Cube21.Work
 
         public virtual String FileName
         {
-            get { return DatabaseManager.DatabasePath + "Shape" + ShapeIndex.ToString("00") + ".data"; }
+            get
+            {
+                return Path.Combine(DatabaseManager.DatabasePath, "Shape" + ShapeIndex.ToString("00") + ".data");
+            }
         }
 
         public virtual bool IsLoaded
