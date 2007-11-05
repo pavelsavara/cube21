@@ -78,6 +78,7 @@ namespace Zamboch.Cube21.Work
                 {
                     Cube expansion = expansions[i];
                     Correction norm = expansion.Normalize();
+                    Step steprt = (Step)steps[i];
                     bool found = false;
                     string key;
                     key = expansion.ToString();
@@ -92,6 +93,13 @@ namespace Zamboch.Cube21.Work
                             Cube rotated = new Cube(expansion);
                             rotation.FromNormalStep.DoAction(rotated);
                             key = rotated.ToString();
+#if DEBUG
+                            SmartStep testst = steprt + norm + rotation.FromNormalStep;
+                            Cube test = new Cube(sourceCube);
+                            testst.DoAction(test);
+                            if (!test.Equals(rotated))
+                                throw new InvalidProgramException();
+#endif
                             if (unique.ContainsKey(key))
                             {
                                 found = true;
@@ -102,7 +110,7 @@ namespace Zamboch.Cube21.Work
                     if (!found)
                     {
                         unique.Add(key, expansion);
-                        SmartStep step = new SmartStep((Step)steps[i], norm);
+                        SmartStep step = new SmartStep(steprt, norm);
                         int targetShapeIndex = expansion.ShapeIndex;
                         step.TargetShapeIndex = targetShapeIndex;
                         shape.NextSteps.Add(step);
@@ -182,6 +190,15 @@ namespace Zamboch.Cube21.Work
                 Cube correction = corrections[i];
                 uint shapeBits = correction.ComputeShapeBits();
                 Correction step = (Correction)steps[i];
+#if DEBUG
+                Correction inversion = new Correction(step);
+                inversion.Invert();
+
+                Cube test=new Cube(cube);
+                step.DoAction(test);
+                inversion.DoAction(test);
+#endif
+
                 if (!Database.shapeNormalizer.ContainsKey(shapeBits))
                 {
                     RotatedShape rshape = new RotatedShape();

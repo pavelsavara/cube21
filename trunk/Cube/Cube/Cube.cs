@@ -317,27 +317,28 @@ namespace Zamboch.Cube21
             //original rotations
             List<Cube> rotations = ExpandRotate(out actions);
 
+            Cube flip=new Cube(this);
+            flip.Flip();
+            List<Action> actionsf;
+            List<Cube> rotationsf = flip.ExpandRotate(out actionsf);
 
-            List<Cube> outlist = new List<Cube>(rotations);
-
-            //add flips
-            for (int i = 0; i < rotations.Count; i++)
+            for (int i = 0; i < actionsf.Count; i++)
             {
                 //upgrade action to correction
-                actions[i] = new Correction(actions[i]);
-
-                //copy cube and correction for flip
-                Cube tu = new Cube(rotations[i]);
-                Correction correction = new Correction(actions[i]);
-                tu.Flip();
+                Correction correction = new Correction(actionsf[i]);
                 correction.Flip = true;
-
-                //addd to lists
-                outlist.Add(tu);
-                actions.Add(correction);
+                actionsf[i] = correction;
             }
+            for (int i = 0; i < actions.Count; i++)
+            {
+                //upgrade action to correction
+                Correction correction = new Correction(actions[i]);
+                actions[i] = correction;
+            }
+            rotations.AddRange(rotationsf);
+            actions.AddRange(actionsf);
 
-            return outlist;
+            return rotations;
         }
 
         public List<Cube> ExpandRotate(out List<Action> actions)
@@ -710,6 +711,26 @@ namespace Zamboch.Cube21
             if (steps == null || steps.Count == 0)
                 return null;
             return steps[random.Next(steps.Count)];
+        }
+
+        public SmartStep GetRandomStep(Random random)
+        {
+            Cube normal = new Cube(this);
+            Correction normalize = normal.Normalize();
+            Correction minimalize = normal.Minimalize();
+            SmartStep nextStep = NormalShape.NextSteps[random.Next(NormalShape.NextSteps.Count - 1)];
+            SmartStep res = normalize + minimalize + nextStep;
+#if DEBUG
+            Cube test = new Cube(this);
+            nextStep.DoAction(normal);
+            res.DoAction(test);
+            if (!test.Equals(normal))
+            {
+                SmartStep res2 = normalize + minimalize + nextStep;
+                throw new InvalidProgramException();
+            }
+#endif 
+            return res;
         }
 
         public List<SmartStep> FindSteps(bool away, bool first)

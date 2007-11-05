@@ -29,6 +29,12 @@ namespace Zamboch.Cube21.Actions
             Flip = false;
         }
 
+        public Correction(bool flip, int topShift, int botShift)
+            : base(topShift, botShift)
+        {
+            Flip = flip;
+        }
+
         public override IAction Copy()
         {
             return new Correction(this);
@@ -56,16 +62,16 @@ namespace Zamboch.Cube21.Actions
 
         public override void DoAction(Cube cube)
         {
-            base.DoAction(cube);
             if (Flip)
                 cube.Flip();
+            base.DoAction(cube);
         }
 
         public override void DumpAction(Cube exampleCube, string cubeName, TextWriter tw)
         {
-            base.DumpAction(exampleCube, cubeName, tw);
             if (Flip)
                 tw.WriteLine(@"                {0}Flip();", cubeName);
+            base.DumpAction(exampleCube, cubeName, tw);
         }
 
         public override void UndoAction(Cube cube)
@@ -78,7 +84,7 @@ namespace Zamboch.Cube21.Actions
         public override string ToString()
         {
             if (Flip)
-                return base.ToString() + '!';
+                return '!' + base.ToString();
             else
                 return base.ToString();
         }
@@ -86,7 +92,7 @@ namespace Zamboch.Cube21.Actions
         public override string ToStringEx()
         {
             if (Flip)
-                return base.ToStringEx() + 'F';
+                return 'F' + base.ToStringEx();
             else
                 return base.ToStringEx();
         }
@@ -96,11 +102,31 @@ namespace Zamboch.Cube21.Actions
             if (c1 == null) return c2;
             if (c2 == null) return c1;
 
-            if (c1.Flip && c2.Flip)
-                throw new NotImplementedException();
-
-            Correction correction = new Correction((c1.TopShift + c2.TopShift) % 12, (c1.BotShift + c2.BotShift) % 12);
-            correction.Flip = c1.Flip || c2.Flip;
+            Correction correction;
+            if (!c1.Flip)
+            {
+                if (!c2.Flip)
+                {
+                    correction = new Correction((c1.TopShift + c2.TopShift) % 12, (c1.BotShift + c2.BotShift) % 12);
+                }
+                else
+                {
+                    correction = new Correction((12 - c1.BotShift + c2.TopShift) % 12, (12 - c1.TopShift + c2.BotShift) % 12);
+                    correction.Flip = true;
+                }
+            }
+            else
+            {
+                if (!c2.Flip)
+                {
+                    correction = new Correction((c1.TopShift + c2.TopShift) % 12, (c1.BotShift + c2.BotShift) % 12);
+                    correction.Flip = true;
+                }
+                else
+                {
+                    correction = new Correction((12 - c1.BotShift + c2.TopShift) % 12, (12 - c1.TopShift + c2.BotShift) % 12);
+                }
+            }
             return correction;
         }
 
@@ -124,8 +150,8 @@ namespace Zamboch.Cube21.Actions
             }
             else
             {
-                int top = (12 + s2.TopShift - c1.BotShift) % 12;
-                int bot = (12 + s2.BotShift - c1.TopShift) % 12;
+                int top = (12 + c1.TopShift - s2.BotShift) % 12;
+                int bot = (12 + c1.BotShift - s2.TopShift) % 12;
                 Step s = new Step(top, bot);
                 Correction c=new Correction();
                 c.Flip = true;
@@ -139,28 +165,30 @@ namespace Zamboch.Cube21.Actions
                 return new SmartStep(s2);
             if (s2 == null)
                 throw new ArgumentException();
+
             if (!c1.Flip)
             {
-                int top = (s2.Step.TopShift + c1.TopShift) % 12;
-                int bot = (s2.Step.BotShift + c1.BotShift) % 12;
+                int top = (12 + c1.TopShift + s2.Step.TopShift) % 12;
+                int bot = (12 + c1.BotShift + s2.Step.BotShift) % 12;
                 Step s = new Step(top, bot);
                 return new SmartStep(s, s2.Correction);
             }
             else
             {
-                int top = (12 + c1.TopShift - s2.Step.BotShift) % 12;
-                int bot = (12 + c1.BotShift - s2.Step.TopShift) % 12;
+                int top = (24 - c1.BotShift - s2.Step.BotShift) % 12;
+                int bot = (24 - c1.TopShift - s2.Step.TopShift) % 12;
                 Step step = new Step(top, bot);
                 Correction c;
                 if (s2.Correction != null)
                     if (!s2.Correction.Flip)
                     {
-                        c = new Correction((12 - s2.Correction.BotShift) % 12, (12 - s2.Correction.TopShift) % 12);
+                        c = new Correction((12 + s2.Correction.TopShift) % 12, (12 + s2.Correction.BotShift) % 12);
                         c.Flip = true;
                     }
                     else
                     {
-                        c = new Correction((12 - s2.Correction.TopShift) % 12, (12 - s2.Correction.BotShift) % 12);
+                        c = new Correction((12 + s2.Correction.TopShift) % 12, (12 + s2.Correction.BotShift) % 12);
+                        //c = new Correction((12 + s2.Correction.BotShift) % 12, (12 + s2.Correction.TopShift) % 12);
                         c.Flip = false;
                     }
                 else
@@ -177,7 +205,7 @@ namespace Zamboch.Cube21.Actions
         {
             if (s1 == null)
                 throw new ArgumentException();
-            if (c2==null)
+            if (c2 == null)
                 return new SmartStep(s1);
             Correction c = s1.Correction + c2;
             return new SmartStep(s1.Step, c);

@@ -129,6 +129,7 @@ namespace Zamboch.Cube21.Work
                 if (ActualWork.Count == 0)
                 {
                     InitFirstCube();
+                    Test.TestActions();
                     WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
                 }
 
@@ -210,7 +211,7 @@ namespace Zamboch.Cube21.Work
                 {
                     break;
                 }
-                Test.TestData(SourceLevel, 10000);
+                Test.TestData(SourceLevel, 1000);
                 /*
                 if (SourceLevel == 4)
                 {
