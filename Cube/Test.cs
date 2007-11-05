@@ -10,10 +10,14 @@ namespace Zamboch.Cube21
         {
             DatabaseManager manager = new DatabaseManager();
             manager.Initialize();
-            //Generator.Dump();
             if (Database.instance.IsExplored)
             {
+                TestActions();
                 TestData(12, 10000);
+            }
+            else
+            {
+                Generator.Dump();
             }
         }
 
@@ -31,21 +35,83 @@ namespace Zamboch.Cube21
                 c.RotateBot(2);
                 c.Turn();
                 c.Normalize();
-                int ln = c.ReadLevel();
-                if (ln != 2)
-                    throw new InvalidProgramException();
-                c.Minimalize();
-                c.Minimalize();
-                int lm = c.ReadLevel();
-                if (lm != 2)
-                    throw new InvalidProgramException();
-                TestLevel(maxLevel, count);
+                if (DatabaseManager.SourceLevel >= 2)
+                {
+                    int ln = c.ReadLevel();
+                    if (ln != 2)
+                        throw new InvalidProgramException();
+                    c.Minimalize();
+                    c.Minimalize();
+                    int lm = c.ReadLevel();
+                    if (lm != 2)
+                        throw new InvalidProgramException();
+                    TestLevel(maxLevel, count);
+                }
             }
             catch(Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public static void TestActions()
+        {
+            Random r = new Random();
+
+            Cube w = new Cube();
+            TestJoin(w, new Step(6, 2), new Correction(2, 0));
+            TestJoin(w, new Step(6, 2), new Correction(true, 2, 0));
+            TestJoin(w, new Step(6, 11), new Correction(2, 1));
+            TestJoin(w, new Step(6, 11), new Correction(true, 2, 1));
+
+            foreach (NormalShape normalShape in Database.NormalShapes)
+            {
+                for (int i=0;i<1000;i++)
+                {
+                    Cube x = new Cube(normalShape.ExampleCube);
+                    Cube t = new Cube(normalShape.ExampleCube);
+                    Cube u = new Cube(normalShape.ExampleCube);
+
+                    bool flip = r.Next(10) > 5;
+                    int top = 0;
+                    int bot = 0;
+                    if (flip)
+                        x.Flip();
+                    while (r.Next(10) > 5)
+                        top += x.RotateNextTop();
+                    while (r.Next(10) > 5)
+                        bot += x.RotateNextBot();
+                    Correction re = new Correction(flip, top % 12 , bot % 12);
+                    re.DoAction(t);
+                    if (!t.Equals(x))
+                        throw new InvalidProgramException();
+                    
+                    SmartStep step = x.GetRandomStep(r);
+                    step.DoAction(x);
+                    step.DoAction(t);
+                    
+                    SmartStep ss = re + step;
+                    ss.DoAction(u);
+                    if (!u.Equals(x))
+                        throw new InvalidProgramException();
+                }
+            }
+        }
+
+        private static void TestJoin(Cube a, Step s, Correction r)
+        {
+            SmartStep ss = s + r;
+
+            Cube c = new Cube(a);
+            Cube t = new Cube(a);
+            
+            s.DoAction(c);
+            r.DoAction(c);
+
+            ss.DoAction(t);
+            if (!t.Equals(c))
+                throw new InvalidProgramException();
         }
 
         private static void TestLevel(int maxLevel, int count)
