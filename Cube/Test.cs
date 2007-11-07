@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Work;
 
@@ -13,7 +14,7 @@ namespace Zamboch.Cube21
             if (Database.instance.IsExplored)
             {
                 TestActions();
-                TestData(12, 10000);
+                TestData(13, 100000);
             }
             else
             {
@@ -25,7 +26,55 @@ namespace Zamboch.Cube21
         {
             try
             {
-                Cube c = new Cube();
+                Cube c;
+                if (DatabaseManager.SourceLevel >= 9)
+                {
+                    Cube b = new Cube("C479F23056A18BED");
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        TestCube(b, new Random());
+                    }
+                    b.Normalize();
+                    b.Minimalize();
+                    int lm = b.ReadLevel();
+                    if (lm != 7)
+                        throw new InvalidProgramException("LL 7");
+                    SmartStep ss = new SmartStep(new Step(4, 2), new Correction(10, 6));
+                    b = new Cube("C479F23056A18BED");
+                    c = new Cube("C479F23056A18BED");
+                    Cube d = new Cube("C479F23056A18BED");
+                    ss.DoAction(c);
+                    CheckNext(b, c);
+
+                    Correction normalize = d.Normalize();
+                    normalize.Invert();
+                    SmartStep ss2 = normalize + ss;
+                    ss2.DoAction(d);
+                    if (!d.Equals(c))
+                        throw new InvalidProgramException();
+
+                    b.ExpandToShape(18);
+
+                    List<Action> a;
+                    List<Cube> rotate = c.ExpandRotate(out a);
+                    bool found = false;
+                    foreach (Cube cube in rotate)
+                    {
+                        lm = cube.ReadLevel(false);
+                        if (lm == 8)
+                            found = true;
+                    }
+                    if (!found)
+                        throw new InvalidProgramException();
+
+                    b.Normalize();
+                    b.Minimalize();
+                    lm = c.ReadLevel();
+                    
+                    if (lm != 8)
+                        throw new InvalidProgramException();
+                }
+                c = new Cube();
                 c.Minimalize();
                 c.Minimalize();
                 c.Minimalize();
@@ -69,34 +118,69 @@ namespace Zamboch.Cube21
             {
                 for (int i=0;i<1000;i++)
                 {
-                    Cube x = new Cube(normalShape.ExampleCube);
-                    Cube t = new Cube(normalShape.ExampleCube);
-                    Cube u = new Cube(normalShape.ExampleCube);
-
-                    bool flip = r.Next(10) > 5;
-                    int top = 0;
-                    int bot = 0;
-                    if (flip)
-                        x.Flip();
-                    while (r.Next(10) > 5)
-                        top += x.RotateNextTop();
-                    while (r.Next(10) > 5)
-                        bot += x.RotateNextBot();
-                    Correction re = new Correction(flip, top % 12 , bot % 12);
-                    re.DoAction(t);
-                    if (!t.Equals(x))
-                        throw new InvalidProgramException();
-                    
-                    SmartStep step = x.GetRandomStep(r);
-                    step.DoAction(x);
-                    step.DoAction(t);
-                    
-                    SmartStep ss = re + step;
-                    ss.DoAction(u);
-                    if (!u.Equals(x))
-                        throw new InvalidProgramException();
+                    Cube source = normalShape.ExampleCube;
+                    TestCube(source, r);
                 }
             }
+        }
+
+        private static void TestCube(Cube source, Random r)
+        {
+            Cube x = new Cube(source);
+            Cube t = new Cube(source);
+            Cube u = new Cube(source);
+
+            bool flip = r.Next(10) > 5;
+            int top = 0;
+            int bot = 0;
+            if (flip)
+                x.Flip();
+            while (r.Next(10) > 5)
+                top += x.RotateNextTop();
+            while (r.Next(10) > 5)
+                bot += x.RotateNextBot();
+            Correction re = new Correction(flip, top % 12 , bot % 12);
+            re.DoAction(t);
+            if (!t.Equals(x))
+                throw new InvalidProgramException();
+                    
+            SmartStep step = x.GetRandomStep(r);
+            step.DoAction(x);
+            step.DoAction(t);
+                    
+            SmartStep ss = re + step;
+            ss.DoAction(u);
+            if (!u.Equals(x))
+                throw new InvalidProgramException();
+
+
+            Cube y = new Cube(source);
+            Step s;
+            y = RandomMove(y, r, out s);
+            y.Normalize();
+            y.Minimalize();
+            CheckNext(source, y);
+        }
+
+        private static void CheckNext(Cube source, Cube target)
+        {
+            bool found = false;
+            foreach (SmartStep nextStep in source.NormalShape.NextSteps)
+            {
+                Cube z = new Cube(source);
+                z.Normalize();
+                z.Minimalize();
+                nextStep.DoAction(z);
+                z.Normalize();
+                z.Minimalize();
+                if (z.Equals(target))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                throw new InvalidProgramException();
         }
 
         private static void TestJoin(Cube a, Step s, Correction r)
@@ -137,22 +221,39 @@ namespace Zamboch.Cube21
                 currentLevel = next.ReadLevel();
                 TestLevel(currentLevel, lastLevel, next);
                 lastLevel = currentLevel;
-                cube = next;
 
                 //Console.WriteLine("{0:00} {1}", lastLevel, cube);
 
                 if (lastLevel == 1)
+                {
                     up = true;
-                if (lastLevel == maxLevel)
+                }
+                else if (lastLevel >= maxLevel)
+                {
                     up = false;
+                }
+                else if (step == null)
+                {
+                    Step s;
+                    Cube n2 = next;
+                    next = RandomMove(n2, r, out s);
+                    currentLevel = next.ReadLevel();
+                    TestLevel(currentLevel, lastLevel, next);
 
+                    Console.WriteLine("Reached {0:00} {1} {2} {3}", currentLevel, next, next.Shape, next.NormalShape);
+                    
+                    //restart
+                    lastLevel = 1;
+                    next = new Cube();
+                }
+                cube = next;
             }
             Console.WriteLine("Test done");
         }
 
         private static Cube RandomMove(Cube cube, Random r, out Step s)
         {
-            s=new Step();
+            s = new Step();
             Cube next=new Cube(cube);
             for (int t = 0; t < r.Next(6); t++)
             {
@@ -173,7 +274,8 @@ namespace Zamboch.Cube21
                 currentLevel != lastLevel)
             {
                 int level = tested.ReadLevel();
-                throw new InvalidProgramException();
+                string err = string.Format("Bad level {0} {1} {2}", currentLevel, lastLevel, tested);
+                throw new InvalidProgramException(err);
             }
         }
 

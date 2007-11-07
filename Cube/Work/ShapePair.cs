@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Xml.Serialization;
+using Zamboch.Cube21.Ranking;
 
 namespace Zamboch.Cube21.Work
 {
@@ -15,19 +16,17 @@ namespace Zamboch.Cube21.Work
     {
         #region Data
 
-        [XmlAttribute]
+        [XmlAttribute("SS")]
         public int SourceShapeIndex;
 
-        [XmlAttribute]
+        [XmlAttribute("WT")]
         public WorkType WorkType;
 
-        [XmlAttribute]
+        [XmlAttribute("TS")]
         public int TargetShapeIndex;
 
-        [XmlAttribute]
-        public int SumOfWork = 1;
-
-        public List<WorkItem> Work = new List<WorkItem>();
+        [XmlAttribute("SW")]
+        public long SumOfWork = 1;
 
         #endregion
 
@@ -61,34 +60,79 @@ namespace Zamboch.Cube21.Work
 
         public bool DoWork()
         {
-            Queue<WorkItem> queue;
-            queue = new Queue<WorkItem>(Work);
             Console.WriteLine("Started SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
-            while (queue.Count > 0)
+            for (int sourcePageSmallIndex = 0; sourcePageSmallIndex < SmallCubeRank.PermCount; sourcePageSmallIndex++)
             {
-                WorkItem workItem = queue.Dequeue();
-                switch (WorkType)
+                NormalShape sh = Database.GetShape(SourceShapeIndex);
+                if (sh.SmallIndexToPages.ContainsKey(sourcePageSmallIndex))
                 {
-                    case WorkType.ExpandCubes:
-                        workItem.ExploreCubes();
-                        break;
-                    case WorkType.FillGaps:
-                        workItem.FillGaps();
-                        break;
-
-                }
-                if (Console.KeyAvailable)
-                {
-                    Work = new List<WorkItem>(queue);
-                    return false;
+                    Page srcPage = sh.SmallIndexToPages[sourcePageSmallIndex];
+                    if (srcPage != null && srcPage.LevelCounts[DatabaseManager.SourceLevel] > 0)
+                    {
+                        switch (WorkType)
+                        {
+                            case WorkType.ExpandCubes:
+                                ExploreCubes(sourcePageSmallIndex);
+                                break;
+                            case WorkType.FillGaps:
+                                FillGaps(sourcePageSmallIndex);
+                                break;
+                        }
+                    }
                 }
             }
             Console.WriteLine("Finished SourceShape {0:00}, TargetShape {1:00}", SourceShapeIndex, TargetShapeIndex);
             if (WorkType==WorkType.FillGaps)
                 DatabaseManager.GetShapeLoader(SourceShapeIndex).Close();
-            Work.Clear();
             return true;
         }
+
+        public bool ExploreCubes(int sourcePageSmallIndex)
+        {
+            ShapeLoader sourceShape = DatabaseManager.GetShapeLoader(SourceShapeIndex);
+            ShapeLoader targetShape = DatabaseManager.GetShapeLoader(TargetShapeIndex);
+            PageLoader sourcePage = DatabaseManager.GetPageLoader(sourceShape, sourcePageSmallIndex);
+
+            try
+            {
+                sourceShape.Load();
+                try
+                {
+                    targetShape.Load();
+
+                    sourcePage.ExploreCubes(targetShape, DatabaseManager.SourceLevel);
+                }
+                finally
+                {
+                    targetShape.Release();
+                }
+            }
+            finally
+            {
+                sourceShape.Release();
+            }
+
+            return true;
+        }
+
+        public bool FillGaps(int sourcePageSmallIndex)
+        {
+            ShapeLoader shape = DatabaseManager.GetShapeLoader(SourceShapeIndex);
+            PageLoader page = DatabaseManager.GetPageLoader(shape, sourcePageSmallIndex);
+
+            try
+            {
+                shape.Load();
+                page.FillGaps();
+            }
+            finally
+            {
+                shape.Release();
+            }
+
+            return true;
+        }
+
 
         #endregion
 
@@ -105,9 +149,9 @@ namespace Zamboch.Cube21.Work
             return (SourceShapeIndex == shapeIndex || TargetShapeIndex == shapeIndex);
         }
 
-        public static int GetShapeScore(List<ShapePair> pairs, int shapeIndex)
+        public static long GetShapeScore(List<ShapePair> pairs, int shapeIndex)
         {
-            int c = 0;
+            long c = 0;
             foreach (ShapePair pair in pairs)
             {
                 if (pair.SourceShapeIndex == shapeIndex || pair.TargetShapeIndex == shapeIndex)
@@ -118,9 +162,9 @@ namespace Zamboch.Cube21.Work
             return c;
         }
 
-        public static int GetShapeScore(List<ShapePair> pairs, int shapeIndex1, int shapeIndex2)
+        public static long GetShapeScore(List<ShapePair> pairs, int shapeIndex1, int shapeIndex2)
         {
-            int c = 0;
+            long c = 0;
             foreach (ShapePair pair in pairs)
             {
                 if (pair.IsShape(shapeIndex1) && pair.IsShape(shapeIndex2))
@@ -137,7 +181,9 @@ namespace Zamboch.Cube21.Work
 
         public override bool Equals(object obj)
         {
-            ShapePair p = (ShapePair)obj;
+            ShapePair p = obj as ShapePair;
+            if (p==null)
+                return false;
             return (p.SourceShapeIndex == SourceShapeIndex && p.TargetShapeIndex == TargetShapeIndex);
         }
 

@@ -126,10 +126,10 @@ namespace Zamboch.Cube21.Work
 
             try
             {
+                Test.TestActions();
                 if (ActualWork.Count == 0)
                 {
                     InitFirstCube();
-                    Test.TestActions();
                     WorkQueue.ThisLevelWork = PrepareNextLevel(SourceLevel, out Database.LevelCounts[SourceLevel]);
                 }
 
@@ -205,13 +205,14 @@ namespace Zamboch.Cube21.Work
 
         private bool DoWork()
         {
+            Test.TestData(SourceLevel, 10000);
+            GC.Collect();
             while (true)
             {
                 if (ActualWork.Count == 0)
                 {
                     break;
                 }
-                Test.TestData(SourceLevel, 1000);
                 /*
                 if (SourceLevel == 4)
                 {
@@ -237,7 +238,7 @@ namespace Zamboch.Cube21.Work
                 }
 
                 Save();
-                Test.TestData(SourceLevel, 100);
+                Test.TestData(SourceLevel, 1000);
                 GC.Collect();
             }
             return true;
@@ -319,10 +320,6 @@ namespace Zamboch.Cube21.Work
             {
                 ShapePair pair = new ShapePair(shape.ShapeIndex, shape.ShapeIndex);
                 pair.WorkType = WorkType.FillGaps;
-                foreach (Page page in shape.Pages)
-                {
-                    pair.Work.Add(new WorkItem(page, -1, -1));
-                }
                 ActualWork.Add(pair);
             }
         }
@@ -333,63 +330,31 @@ namespace Zamboch.Cube21.Work
 
         private static List<ShapePair> PrepareNextLevel(int sourceLevel, out long levelCount)
         {
-            List<WorkItem> nextLevel = new List<WorkItem>();
-            Dictionary<int, WorkItem> hash = new Dictionary<int, WorkItem>();
-            Dictionary<int, ShapePair> shapePairs = new Dictionary<int, ShapePair>();
+            List<ShapePair> pairs = new List<ShapePair>();
 
             levelCount = 0;
-            foreach (NormalShape shape in Database.NormalShapes)
+            foreach (NormalShape sourceShape in Database.NormalShapes)
             {
-                shape.LevelCounts[sourceLevel] = 0;
-                foreach (Page page in shape.Pages)
+                sourceShape.Pages.Sort();
+                sourceShape.LevelCounts[sourceLevel] = 0;
+                foreach (Page page in sourceShape.Pages)
                 {
-                    shape.LevelCounts[sourceLevel] += page.LevelCounts[sourceLevel];
+                    sourceShape.LevelCounts[sourceLevel] += page.LevelCounts[sourceLevel];
                 }
-                levelCount += shape.LevelCounts[sourceLevel];
-            }
-
-            foreach (NormalShape tgShape in Database.NormalShapes)
-            {
-                tgShape.Pages.Sort();
-                foreach (Page page in tgShape.Pages)
+                levelCount += sourceShape.LevelCounts[sourceLevel];
+                if (sourceShape.LevelCounts[sourceLevel]>0)
                 {
-                    int work = page.LevelCounts[sourceLevel];
-                    if (work > 0)
+                    foreach (int targetShapeIndex in sourceShape.AllTargetShapeIndexes)
                     {
-                        foreach (int targetShapeIndex in page.Shape.AllTargetShapeIndexes)
-                        {
-                            WorkItem nw = new WorkItem(page, targetShapeIndex, sourceLevel);
-                            int ha = nw.GetHashCode();
-                            if (!hash.ContainsKey(ha))
-                            {
-                                hash.Add(ha, nw);
-                                nextLevel.Add(nw);
-                                ShapePair p = new ShapePair(page.Shape.ShapeIndex, targetShapeIndex);
-                                if (shapePairs.ContainsKey(p.ID))
-                                {
-                                    shapePairs[p.ID].SumOfWork++;
-                                    shapePairs[p.ID].Work.Add(nw);
-                                }
-                                else
-                                {
-                                    p.SumOfWork = 1;
-                                    p.Work = new List<WorkItem>();
-                                    p.Work.Add(nw);
-                                    shapePairs.Add(p.ID, p);
-                                }
-                            }
-                        }
+                        ShapePair p = new ShapePair(sourceShape.ShapeIndex, targetShapeIndex);
+                        p.SumOfWork = sourceShape.LevelCounts[sourceLevel];
+                        pairs.Add(p);
                     }
                 }
             }
-            List<ShapePair> pairs = new List<ShapePair>(shapePairs.Values);
+
             pairs.Sort();
             ReorderPairs(pairs);
-
-            foreach (ShapePair pair in pairs)
-            {
-                pair.Work.Sort();
-            }
 
             return pairs;
         }
@@ -409,7 +374,7 @@ namespace Zamboch.Cube21.Work
 
             while (true)
             {
-                int bestScore;
+                long bestScore;
                 //kick weakest shape
                 if ((shapesIn.Count + 1) > (maxShapesLoaded - preLoaded))
                 {
@@ -456,21 +421,21 @@ namespace Zamboch.Cube21.Work
 
             while (shapesIn.Count > 1)
             {
-                int bestScore;
+                long bestScore;
                 int kick = KickOne(shapesIn, pairsWaiting, out bestScore);
                 shapesIn.Remove(kick);
             }
             return shapesIn;
         }
 
-        private static int KickOne(List<int> shapesIn, List<ShapePair> pairsWaiting, out int bestScore)
+        private static int KickOne(List<int> shapesIn, List<ShapePair> pairsWaiting, out long bestScore)
         {
             List<int> shapesInTemp = new List<int>(shapesIn);
             bestScore = -1;
             int bestKick = -1;
             foreach (int kickShape in shapesIn)
             {
-                int score;
+                long score;
                 shapesInTemp.Remove(kickShape);
                 GetOne(shapesInTemp, pairsWaiting, out score);
                 if (score > bestScore)
@@ -483,7 +448,7 @@ namespace Zamboch.Cube21.Work
             return bestKick;
         }
 
-        private static int GetOne(List<int> shapesIn, List<ShapePair> pairsWaiting, out int bestScore)
+        private static int GetOne(List<int> shapesIn, List<ShapePair> pairsWaiting, out long bestScore)
         {
             bestScore = -1;
             int bestShapeIndex = -1;
@@ -491,7 +456,7 @@ namespace Zamboch.Cube21.Work
             {
                 if (!shapesIn.Contains(shapeOutIndex))
                 {
-                    int shapeScore = 0;
+                    long shapeScore = 0;
                     if (shapesIn.Count == 0)
                     {
                         shapeScore += ShapePair.GetShapeScore(pairsWaiting, shapeOutIndex);
