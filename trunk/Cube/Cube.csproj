@@ -62,7 +62,6 @@
     <Compile Include="Work\ShapeLoader.cs" />
     <Compile Include="Work\ShapePair.cs" />
     <Compile Include="Actions\SmartStep.cs" />
-    <Compile Include="Work\WorkItem.cs" />
     <Compile Include="Ranking\CubeRank.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Exceptions.cs" />

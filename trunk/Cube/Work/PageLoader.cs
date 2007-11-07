@@ -181,7 +181,7 @@ namespace Zamboch.Cube21.Work
             byte d;
             using (FileStream fs = OpenFile())
             {
-                fs.Seek(address + (ShapeIndex * pageSize), SeekOrigin.Begin);
+                fs.Seek(address + (SmallIndex * pageSize), SeekOrigin.Begin);
                 d = (byte)fs.ReadByte();
             }
             return d;
@@ -191,7 +191,7 @@ namespace Zamboch.Cube21.Work
         {
             using (FileStream fs = OpenFile())
             {
-                fs.Seek(address + (ShapeIndex * pageSize), SeekOrigin.Begin);
+                fs.Seek(address + (SmallIndex * pageSize), SeekOrigin.Begin);
                 fs.WriteByte(d);
             }
         }

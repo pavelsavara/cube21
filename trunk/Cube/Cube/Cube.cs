@@ -640,6 +640,32 @@ namespace Zamboch.Cube21
 
         #region Database usage
 
+        public void ExpandToShape(int targetShapeIndex)
+        {
+            Cube copy = new Cube(this);
+            copy.Normalize();
+            copy.Minimalize();
+            int bigIndex;
+            int smallIndex;
+            copy.GetIndexes(out bigIndex, out smallIndex);
+            ShapeLoader sourceShapeLoader = DatabaseManager.GetShapeLoader(copy.ShapeIndex);
+            ShapeLoader targetShapeLoader = DatabaseManager.GetShapeLoader(targetShapeIndex);
+            try
+            {
+                sourceShapeLoader.Load();
+                targetShapeLoader.Load();
+                PageLoader pageLoader = DatabaseManager.GetPageLoader(sourceShapeLoader, smallIndex);
+                int sourceLevel = pageLoader.Read(bigIndex);
+                pageLoader.ExploreCubes(targetShapeLoader, sourceLevel);
+            }
+            finally
+            {
+                targetShapeLoader.Release();
+                sourceShapeLoader.Release();
+            }
+            
+        }
+
         public bool WriteLevel(int level)
         {
             Cube copy = new Cube(this);
@@ -663,9 +689,15 @@ namespace Zamboch.Cube21
 
         public int ReadLevel()
         {
+            return ReadLevel(true);
+        }
+
+        public int ReadLevel(bool minimalize)
+        {
             Cube copy=new Cube(this);
             copy.Normalize();
-            copy.Minimalize();
+            if (minimalize)
+                copy.Minimalize();
             int bigIndex;
             int smallIndex;
             copy.GetIndexes(out bigIndex, out smallIndex);
