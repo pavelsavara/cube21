@@ -13,13 +13,10 @@ namespace Zamboch.Cube21
     {
         #region Data
 
-        public bool IsLocal = false;
         public bool IsExplored = false;
-        public bool IsFilled = false;
         public DateTime[] TimeStart = new DateTime[15];
         public DateTime[] TimeEnd = new DateTime[15];
         public long[] LevelCounts = new long[15];
-        public long[] LevelFillCounts = new long[15];
         public List<NormalShape> normalShapes = new List<NormalShape>();
 
         #endregion
@@ -89,6 +86,13 @@ namespace Zamboch.Cube21
 
         public void Save()
         {
+            if (IsExplored)
+            {
+                foreach (NormalShape normalShape in normalShapes)
+                {
+                    normalShape.Pages = new List<Page>();
+                }
+            }
             string workDir = System.IO.Path.GetDirectoryName(databaseFile);
             if (!Directory.Exists(workDir))
                 Directory.CreateDirectory(workDir);
@@ -99,16 +103,19 @@ namespace Zamboch.Cube21
             }
         }
 
-        public static Database Load()
+        public static Database Load(bool register)
         {
             using (StreamReader sr = new StreamReader(databaseFile))
             {
                 Database ins = (Database)databaseSerializer.Deserialize(sr);
-                whiteShape = ins.normalShapes[0];
-                white.Shape = whiteShape;
-                foreach (NormalShape shape in ins.normalShapes)
+                if (register)
                 {
-                    shape.RegisterLoaded();
+                    whiteShape = ins.normalShapes[0];
+                    white.Shape = whiteShape;
+                    foreach (NormalShape shape in ins.normalShapes)
+                    {
+                        shape.RegisterLoaded();
+                    }
                 }
                 return ins;
             }
@@ -204,15 +211,6 @@ namespace Zamboch.Cube21
                         sw.Write("|L={0,10}", shape.LevelCounts[l]);
                     }
                     sw.WriteLine();
-                    if (IsFilled)
-                    {
-                        sw.Write("            ");
-                        for (int l = 0; l < 13; l++)
-                        {
-                            sw.Write("|F={0,10}", shape.LevelFillCounts[l]);
-                        }
-                        sw.WriteLine();
-                    }
                 }
             }
 

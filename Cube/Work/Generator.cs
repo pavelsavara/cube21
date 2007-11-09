@@ -37,7 +37,7 @@ namespace Zamboch.Cube21.Work
                 }
                 if (testing) break;
             }
-
+            /*
             foreach (NormalShape shape in Database.NormalShapes)
             {
                 if (shape.Alternatives.Count > 0)
@@ -47,11 +47,12 @@ namespace Zamboch.Cube21.Work
                 }
                 if (testing) break;
             }
+             */
 
             OutroIntroM(sw);
 
             DumpExploreIndex(sw);
-            DumpFillIndex(sw);
+            //DumpFillIndex(sw);
             OutroM(sw);
             sw.Close();
         }

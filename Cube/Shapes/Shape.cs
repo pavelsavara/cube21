@@ -16,8 +16,6 @@ namespace Zamboch.Cube21
         [XmlAttribute("Index")]
         public int ShapeIndex;
 
-        public int Level;
-
         #endregion
 
         #region Properties

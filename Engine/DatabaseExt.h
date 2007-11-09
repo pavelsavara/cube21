@@ -14,35 +14,65 @@ namespace Zamboch
 			public ref class DatabaseExt : public DatabaseManager
 			{
 			public:
+				DatabaseExt()
+				{
+					mappedFactory=false;
+				}
+
 				static void Main()
 				{
-					DatabaseExt^ manager = gcnew DatabaseExt();
-		            manager->Initialize();
-					DatabaseManager::Database->IsLocal = true;
-					//Test::TestData();
-					manager->Database->DumpShapes();
+					DatabaseExt^ manager;
+					if (DatabaseManager::instance==nullptr)
+					{
+						manager = gcnew DatabaseExt();
+						manager->Initialize();
+					}
+					else
+					{
+						manager=dynamic_cast<DatabaseExt^>(DatabaseManager::instance);
+					}
 					if (manager->Explore())
 					{
-						/*
-						if (manager->FillGaps())
-						{
-							Test::TestData(12, 10000);
-						}
-						*/
 						Test::TestData(12, 10000);
 					}
+					DatabaseManager::CloseAll();
 				}
 
 				virtual Zamboch::Cube21::Work::PageLoader^ CreatePageLoder(Page^ page) override
 				{
-					return gcnew FastGenPage(page);
+					if (mappedFactory)
+						return gcnew FastGenPage(page);
+					else
+						return DatabaseManager::CreatePageLoder(page);
+					
 				}
 
 				virtual Zamboch::Cube21::Work::ShapeLoader^ CreateShapeLoder(NormalShape^ shape) override
 				{
-					return gcnew FastShape(shape);
+					if (mappedFactory)
+						return gcnew FastShape(shape);
+					else
+						return DatabaseManager::CreateShapeLoder(shape);
 				}
+
+				property bool IsMapped
+				{
+					void set(bool value)
+					{
+						mappedFactory=value;
+					}
+				}
+
+				static property DatabaseExt^ Instance
+				{
+					DatabaseExt^ get()
+					{
+						return dynamic_cast<DatabaseExt^>(DatabaseManager::instance);
+					}
+				}
+
 			private:
+				bool mappedFactory;
 				static DatabaseExt()
 				{
 					Ranking::FastRank::Touch();

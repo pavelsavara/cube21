@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="DatabasePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">D:\Cube21</Value>
+      <Value Profile="(Default)">C:\Cube21</Value>
+    </Setting>
+    <Setting Name="DatabaseLocal" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

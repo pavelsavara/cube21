@@ -608,6 +608,16 @@ namespace Zamboch.Cube21
             return PieceHelper.ToString(top) + "-" + PieceHelper.ToString(bot);
         }
 
+        public string TopToString()
+        {
+            return PieceHelper.ToString(top);
+        }
+
+        public string BotToString()
+        {
+            return PieceHelper.ToString(bot);
+        }
+
         public bool Equals(Cube o)
         {
             for (int i = 0; i < 12; i++)
@@ -716,9 +726,18 @@ namespace Zamboch.Cube21
 
         public Path FindWayHome()
         {
-            //Path path=new Path();
-            //return path;
-            throw new NotImplementedException();
+            Cube temp=new Cube(this);
+            Path path=new Path();
+            while (!temp.Equals(Database.white))
+            {
+                SmartStep step = temp.FindStepHome();
+                if (step == null)
+                    break;
+                path.Add(step);
+                step.DoAction(temp);
+            }
+            path.Compress();
+            return path;
         }
 
         public SmartStep FindStepHome()
@@ -819,5 +838,10 @@ namespace Zamboch.Cube21
         }
 
         #endregion
+
+        public override bool Equals(object obj)
+        {
+            return ToString() == obj.ToString();
+        }
     }
 }
