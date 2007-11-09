@@ -61,38 +61,6 @@ namespace Zamboch
 					}
 				}
 				void ExplorePage(int sourceLevel, int sourceSmallIndex, int targetShapeIndex, byte* dataPtr, int* cntpages);
-
-				virtual void FillGaps() override
-				{
-					int cntpages[SmallPermCount*15];
-					memset(cntpages, 0,4*SmallPermCount*15);
-					int sourceSmallIndex = SmallIndex;
-
-					FillPage(sourceSmallIndex, dataPtr, cntpages);
-
-					try
-					{
-						Monitor::Enter(this);
-
-						for(int i=0;i<SmallPermCount;i++)
-						{
-							for(int l=0;l<15;l++)
-							{
-								int c=cntpages[i+(l*SmallPermCount)];
-								if (c>0)
-								{
-									FastPage^ p=dynamic_cast<FastPage^>(DatabaseManager::GetPageLoader(ShapeLoader, i));
-									p->Page->LevelFillCounts[l]+=c;
-								}
-							}
-						}
-					}
-					finally
-					{
-						Monitor::Exit(this);
-					}
-				}
-				void FillPage(int sourceSmallIndex, byte* dataPtr, int* cntpages);
 			};
 		}
 	}

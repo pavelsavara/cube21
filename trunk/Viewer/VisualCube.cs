@@ -39,6 +39,22 @@ namespace Viewer
             AnimateTurnRight();
         }
 
+        public void RotateBot(int shift)
+        {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
+            Cube.RotateBot(shift);
+            AnimateBot(shift);
+        }
+
+        public void RotateTop(int shift)
+        {
+            if (OnBeforeAnimation != null)
+                OnBeforeAnimation();
+            Cube.RotateTop(shift);
+            AnimateTop(shift);
+        }
+
         public void RotateNextBot()
         {
             if (OnBeforeAnimation != null)
@@ -69,6 +85,11 @@ namespace Viewer
                 OnBeforeAnimation();
             int shift = Cube.RotatePrevTop();
             AnimateTop(shift);
+        }
+
+        public void Refresh()
+        {
+            CreateCube();
         }
 
         #endregion

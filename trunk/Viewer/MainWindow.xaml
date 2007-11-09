@@ -13,10 +13,14 @@
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<Menu Grid.Column="0" Grid.ColumnSpan="2" Height="22" Name="mainMenu" >
+			<MenuItem Name="mnuDatabase" Header="Database" >
+				<MenuItem Name="mnuOnline" Header="Connect" Click="mnuClose_Click" />
+				<MenuItem Name="mnuGenerate" Header="Generate" Click="mnuGenerate_Click"/>
+			</MenuItem>
 		</Menu>
 
 		<Border Grid.Column="1" Grid.Row="1" Name="tools" Background="AliceBlue">
-			<TextBlock Name="textBlockInfo"/>
+			<TextBlock Name="textBlockInfo" TextWrapping="Wrap" />
 		</Border>
 		<Grid Grid.Column="0" Grid.Row="1" Name="workspace">
 			<Grid.RowDefinitions>
@@ -138,5 +142,10 @@
 				<Button Grid.Column="2" Name="buttonBottomRight" Focusable="False" Click="buttonBottomRight_Click">Rotate Bottom Right --&gt;</Button>
 			</Grid>
 		</Grid>
+		<TextBox Grid.Column="1" Grid.Row="1" Height="21" Margin="15,140,17,0" Name="textBoxTop" VerticalAlignment="Top" MaxLines="1" />
+		<TextBox Grid.Column="1" Grid.Row="1" Height="21" Margin="15,169,15,0" Name="textBoxBot" VerticalAlignment="Top" MaxLines="1" />
+		<Button Grid.Column="1" Grid.Row="1" Height="20" Margin="15,199,11,0" Name="buttonCreate" VerticalAlignment="Top" Click="buttonCreate_Click">Create</Button>
+		<Button Grid.Column="1" Grid.Row="1" Height="20" Margin="15,229,11,0" Name="buttonSolve" VerticalAlignment="Top" Click="buttonSolve_Click">Solve</Button>
+		<Button Grid.Column="1" Grid.Row="1" Margin="15,261,11,0" Name="buttonSolveStep" Height="21" VerticalAlignment="Top" Click="buttonSolveStep_Click">Solve Step</Button>
 	</Grid>
 </Window>

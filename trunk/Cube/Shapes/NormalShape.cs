@@ -18,10 +18,14 @@ namespace Zamboch.Cube21
         [XmlIgnore]
         public ShapeLoader Loader;
 
+        [XmlAttribute]
         public int ParentShapeIndex = -1;
 
         public Step FromParentStep;
         public Cube ExampleCube;
+
+        [XmlAttribute]
+        public int Level;
 
         [XmlIgnore]
         public List<NormalShape> Childern = new List<NormalShape>();
@@ -37,9 +41,6 @@ namespace Zamboch.Cube21
         public List<int> AllTargetShapeIndexes = new List<int>();
 
         public long[] LevelCounts = new long[15];
-        public long[] LevelFillCounts = new long[15];
-        [XmlAttribute]
-        public long MissingCount = (SmallCubeRank.PermCount * BigCubeRank.PermCount);
 
         #endregion
 

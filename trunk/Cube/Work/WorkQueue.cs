@@ -39,20 +39,10 @@ namespace Zamboch.Cube21.Work
             if (!Directory.Exists(workDir))
                 Directory.CreateDirectory(workDir);
 
-            string bak = workFile + DatabaseManager.SourceLevel;
-            while (File.Exists(bak))
+            using (StreamWriter sw = new StreamWriter(workFile))
             {
-                bak = bak + DatabaseManager.SourceLevel;
+                databaseSerializer.Serialize(sw, this);
             }
-            if (File.Exists(workFile))
-            {
-                File.Move(workFile, bak);
-            }
-
-
-            StreamWriter sw = new StreamWriter(workFile);
-            databaseSerializer.Serialize(sw, this);
-            sw.Close();
         }
 
         public static WorkQueue Load()

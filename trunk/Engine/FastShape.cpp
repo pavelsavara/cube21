@@ -120,6 +120,8 @@ namespace Zamboch
 						throw gcnew System::IO::IOException();
 					}
 
+					GC::AddMemoryPressure(PageSize*SmallPermCount);
+
 					//data = (IntPtr)dataPtr;
 					for(int p=0;p<Shape->Pages->Count;p++)
 					{
@@ -150,6 +152,8 @@ namespace Zamboch
 				res=CloseHandle(fileHandle);
 				if (!res)
 					throw gcnew System::IO::IOException();
+				
+				GC::RemoveMemoryPressure(PageSize*SmallPermCount);
 			}
 
 			void FastShape::KickOld()

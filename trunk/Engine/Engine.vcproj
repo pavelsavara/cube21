@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			ManagedExtensions="1"
 			>
@@ -65,8 +65,10 @@
 				AssemblyDebug="1"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
+				FixedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
+				KeyFile="..\Cube.snk"
 			/>
 			<Tool
 				Name="VCALinkTool"

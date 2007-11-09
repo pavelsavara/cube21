@@ -15,6 +15,25 @@ namespace Zamboch.Cube21.Actions
             throw new NotImplementedException();
         }
 
+        public void Compress()
+        {
+            if (Count<2) return;
+
+            Path n = new Path();
+            SmartStep prev = (SmartStep)this[0];
+            for (int i = 1; i < Count; i++)
+            {
+                SmartStep curr = (SmartStep)this[i];
+                SmartStep prod = prev.Correction + curr;
+                prev.Correction = null;
+                n.Add(prev);
+                prev = prod;
+            }
+            n.Add(prev);
+            Clear();
+            AddRange(n);
+        }
+
         public Path(Action action)
         {
             Add(action);
@@ -45,7 +64,7 @@ namespace Zamboch.Cube21.Actions
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (Step step in this)
+            foreach (IAction step in this)
             {
                 sb.Append(step.ToString());
             }

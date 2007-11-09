@@ -38,8 +38,6 @@ namespace Zamboch.Cube21
         public PageLoader Loader;
 
         public int[] LevelCounts = new int[15];
-        public int[] LevelFillCounts = new int[15];
-
         #endregion
 
         #region Properties

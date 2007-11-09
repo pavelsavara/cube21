@@ -181,7 +181,7 @@ namespace Zamboch.Cube21.Work
             byte d;
             using (FileStream fs = OpenFile())
             {
-                fs.Seek(address + (SmallIndex * pageSize), SeekOrigin.Begin);
+                fs.Seek(address + (SmallIndex * PageSize), SeekOrigin.Begin);
                 d = (byte)fs.ReadByte();
             }
             return d;
@@ -191,12 +191,12 @@ namespace Zamboch.Cube21.Work
         {
             using (FileStream fs = OpenFile())
             {
-                fs.Seek(address + (SmallIndex * pageSize), SeekOrigin.Begin);
+                fs.Seek(address + (SmallIndex * PageSize), SeekOrigin.Begin);
                 fs.WriteByte(d);
             }
         }
 
-        private int pageSize = BigCubeRank.PermCount / 2;
+        public const int PageSize = BigCubeRank.PermCount / 2;
 
         private FileStream OpenFile()
         {
@@ -205,7 +205,7 @@ namespace Zamboch.Cube21.Work
                 new FileStream(ShapeLoader.FileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
             if (!exists)
             {
-                fs.SetLength(SmallCubeRank.PermCount * pageSize);
+                fs.SetLength(SmallCubeRank.PermCount * PageSize);
             }
             return fs;
         }

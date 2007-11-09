@@ -28,7 +28,7 @@ namespace Zamboch.Cube21.Work
         {
             if (Database.CanLoad())
             {
-                Database = Database.Load();
+                Database = Database.Load(true);
                 if (Database.normalShapes.Count != 90)
                     throw new FileLoadException();
             }
@@ -152,7 +152,6 @@ namespace Zamboch.Cube21.Work
                 {
                     Step step = (Step)steps[i];
                     expansion.Shape = AddShape(expansion, (NormalShape)source.Shape, step);
-                    expansion.Shape.Level = source.Shape.Level + 1;
                     queue.Enqueue(expansion);
                 }
             }
@@ -164,6 +163,7 @@ namespace Zamboch.Cube21.Work
             normal.Parent = parent;
             if (parent != null)
             {
+                normal.Level = parent.Level + 1;
                 parent.Childern.Add(normal);
             }
             normal.FromParentStep = parentStep;

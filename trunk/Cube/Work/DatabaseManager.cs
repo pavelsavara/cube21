@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Zamboch.Cube21.Properties;
+using Zamboch.Cube21.Ranking;
 
 namespace Zamboch.Cube21.Work
 {
@@ -14,6 +16,14 @@ namespace Zamboch.Cube21.Work
             if (instance != null)
                 throw new InvalidOperationException();
             instance = this;
+
+            MEMORYSTATUSEX ms = new MEMORYSTATUSEX();
+            ms.dwLength = (uint)Marshal.SizeOf(ms);
+            GlobalMemoryStatusEx(ref ms);
+
+            maxShapesLoaded = (int)(ms.ullTotalPhys / (PageLoader.PageSize * SmallCubeRank.PermCount * 3));
+            if (maxShapesLoaded < 4)
+                throw new OutOfMemoryException("We need at least 512MB of ram to run (3GB recomended)");
         }
 
         #endregion
@@ -29,11 +39,30 @@ namespace Zamboch.Cube21.Work
             set { WorkQueue.ThisLevelWork = value; }
         }
 
+        private static Settings settings = new Settings();
         public static string DatabasePath
         {
             get
             {
-                return Settings.Default.DatabasePath;
+                return settings.DatabasePath;
+            }
+            set
+            {
+                settings.DatabasePath = value;
+                settings.Save();
+            }
+        }
+
+        public static bool DatabaseLocal
+        {
+            get
+            {
+                return settings.DatabaseLocal;
+            }
+            set
+            {
+                settings.DatabaseLocal = value;
+                settings.Save();
             }
         }
 
@@ -97,6 +126,15 @@ namespace Zamboch.Cube21.Work
             }
         }
 
+        public static void CloseAll()
+        {
+            foreach (NormalShape shape in Database.NormalShapes)
+            {
+                ShapeLoader loader = GetShapeLoader(shape.ShapeIndex);
+                loader.Close();
+            }
+        }
+
         #endregion
 
         #region Init
@@ -136,38 +174,10 @@ namespace Zamboch.Cube21.Work
                 if (!DoWork())
                     return false;
                 Database.IsExplored = true;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw;
-            }
-            finally
-            {
-                Save();
-            }
-        }
-
-        public virtual bool FillGaps()
-        {
-            if (!Database.IsExplored)
-                return false;
-
-            if (Database.IsFilled)
-                return true;
-
-            try
-            {
-                if (ActualWork.Count == 0)
-                    InitFill();
-
-                if (!DoWork())
-                    return false;
-
-                ComputeCounts();
-
-                Database.IsFilled = true;
+                foreach (NormalShape normalShape in Database.NormalShapes)
+                {
+                    normalShape.Pages = null;
+                }
                 return true;
             }
             catch (Exception ex)
@@ -186,19 +196,14 @@ namespace Zamboch.Cube21.Work
             for (int level = 0; level < 15; level++)
             {
                 Database.LevelCounts[level] = 0;
-                Database.LevelFillCounts[level] = 0;
                 foreach (NormalShape shape in Database.NormalShapes)
                 {
                     shape.LevelCounts[level] = 0;
-                    shape.LevelFillCounts[level] = 0;
                     foreach (Page page in shape.Pages)
                     {
                         shape.LevelCounts[level] += page.LevelCounts[level];
-                        shape.LevelFillCounts[level] += page.LevelFillCounts[level];
                     }
-                    shape.MissingCount -= (shape.LevelCounts[level] + shape.LevelFillCounts[level]);
                     Database.LevelCounts[level] += shape.LevelCounts[level];
-                    Database.LevelFillCounts[level] += shape.LevelFillCounts[level];
                 }
             }
         }
@@ -359,8 +364,8 @@ namespace Zamboch.Cube21.Work
             return pairs;
         }
 
-        public const int maxShapesLoaded = 20; //TODO
-        public const int preLoaded = 2; //TODO
+        public static int maxShapesLoaded = 20;
+        public static int preLoaded = 2;
 
         private static void ReorderPairs(List<ShapePair> pairs)
         {
@@ -495,6 +500,27 @@ namespace Zamboch.Cube21.Work
                 pairsTo.Add(pair);
             }
         }
+
+        #endregion
+
+        #region Memory helper
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct MEMORYSTATUSEX
+        {
+            public uint dwLength;
+            uint dwMemoryLoad;
+            public ulong ullTotalPhys;
+            ulong ullAvailPhys;
+            ulong ullTotalPageFile;
+            ulong ullAvailPageFile;
+            ulong ullTotalVirtual;
+            ulong ullAvailVirtual;
+            ulong ullAvailExtendedVirtual;
+        }
+
+        [DllImport("kernel32.dll")]
+        static extern void GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
         #endregion
     }
