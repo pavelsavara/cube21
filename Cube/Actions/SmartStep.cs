@@ -1,3 +1,8 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.IO;
 using System.Xml.Serialization;
@@ -47,7 +52,8 @@ namespace Zamboch.Cube21.Actions
 
         public virtual void DoAction(Cube cube)
         {
-            Step.DoAction(cube);
+            if (Step!=null)
+                Step.DoAction(cube);
             if (Correction != null)
                 Correction.DoAction(cube);
         }
@@ -56,7 +62,8 @@ namespace Zamboch.Cube21.Actions
         {
             if (Correction != null)
                 Correction.UndoAction(cube);
-            Step.UndoAction(cube);
+            if (Step != null)
+                Step.UndoAction(cube);
         }
 
         public virtual void Invert()

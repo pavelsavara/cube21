@@ -1,3 +1,8 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.IO;
 using System.Text;
@@ -161,9 +166,15 @@ namespace Zamboch.Cube21.Actions
             if (TopShift % 12 != 0 || BotShift % 12 != 0)
             {
                 sb.Append('(');
-                sb.Append(TopShift);
+                if (TopShift > 6)
+                    sb.Append(TopShift - 12);
+                else
+                    sb.Append(TopShift);
                 sb.Append(',');
-                sb.Append(BotShift);
+                if (BotShift > 6)
+                    sb.Append(BotShift - 12);
+                else
+                    sb.Append(BotShift);
                 sb.Append(')');
             }
             return sb.ToString();

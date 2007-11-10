@@ -1,4 +1,9 @@
-﻿using System;
+﻿// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Zamboch.Cube21.Actions;
@@ -98,7 +103,7 @@ namespace Zamboch.Cube21.Work
                             Cube test = new Cube(sourceCube);
                             testst.DoAction(test);
                             if (!test.Equals(rotated))
-                                throw new InvalidProgramException();
+                                throw new InvalidProgramCubeException();
 #endif
                             if (unique.ContainsKey(key))
                             {
@@ -221,7 +226,7 @@ namespace Zamboch.Cube21.Work
                         }
                         else
                         {
-                            throw new InvalidProgramException();
+                            throw new InvalidProgramCubeException();
                         }
                     }
                 }

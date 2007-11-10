@@ -1,13 +1,20 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Zamboch.Cube21.Actions
 {
-    public class Path : List<IAction>
+    public class Path : List<SmartStep>
     {
-        public Path()
+        public Cube From;
+        public Path(Cube from)
         {
+            From=new Cube(from);
         }
 
         public Path Invert()
@@ -15,15 +22,72 @@ namespace Zamboch.Cube21.Actions
             throw new NotImplementedException();
         }
 
+        //doesn't work well
+        public void FlipMiddle(bool left, bool right)
+        {
+            if (Count == 0)
+                return;
+            int turns = Count;
+            SmartStep last = this[Count - 1];
+            if (last.Step == null)
+                turns--;
+            if (turns < 3)
+                //not supported
+                return;
+
+            Step last3 = last.Step;
+            Step last2 = this[Count - 2].Step;
+            Step last1 = this[Count - 3].Step;
+
+            if (last.Correction != null && last.Correction.Flip)
+            {
+                left = !left;
+                right = !right;
+            }
+            if (!left && !right)
+                // no problem
+                return;
+            if (!left && right)
+            {
+                /*
+                last1.TopShift = (this[0].Step.TopShift + 6) % 12;
+                last2.TopShift = (this[1].Step.TopShift + 6) % 12;
+                last3.TopShift = (this[2].Step.TopShift + 6) % 12;
+                 */
+            }
+            else if (left && right)
+            {
+                /*
+                last1.TopShift = (this[0].Step.TopShift + 1) % 12;
+                last2.TopShift = (this[1].Step.TopShift + 6) % 12;
+                last2.BotShift = (this[1].Step.BotShift + 6) % 12;
+                last3.TopShift = (this[2].Step.TopShift + 11) % 12;
+                 */
+            }
+            else if (left && !right)
+            {
+                /*
+                last1.TopShift = (this[0].Step.TopShift + 1) % 12;
+                last2.BotShift = (this[1].Step.BotShift + 6) % 12;
+                last3.TopShift = (this[1].Step.TopShift + 11) % 12;
+                last3.BotShift = (this[1].Step.BotShift + 7) % 12;
+                 */
+            }
+#if DEBUG
+            Cube test = new Cube(From);
+            DoActions(test);
+#endif
+        }
+
         public void Compress()
         {
             if (Count<2) return;
 
-            Path n = new Path();
-            SmartStep prev = (SmartStep)this[0];
+            Path n = new Path(From);
+            SmartStep prev = this[0];
             for (int i = 1; i < Count; i++)
             {
-                SmartStep curr = (SmartStep)this[i];
+                SmartStep curr = this[i];
                 SmartStep prod = prev.Correction + curr;
                 prev.Correction = null;
                 n.Add(prev);
@@ -34,12 +98,12 @@ namespace Zamboch.Cube21.Actions
             AddRange(n);
         }
 
-        public Path(Action action)
+        public Path(SmartStep action)
         {
             Add(action);
         }
 
-        public Path(Action action1, Action action2)
+        public Path(SmartStep action1, SmartStep action2)
         {
             Add(action1);
             Add(action2);

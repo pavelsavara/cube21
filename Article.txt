@@ -1,8 +1,5 @@
 (Back to) Square One / Cube 21
   - silver cube, 
-   - Jaap http://www.geocities.com/jaapsch/puzzles/square1.htm
-   - Mike Masonjones, God's, http://www.geocities.com/jaapsch/puzzles/square1t.htm
-   - Fred Curtis http://f2.org/maths/square1/
   - shapes, different kinds of moves
   - cube model as permutation with repetitions
 Algorithmization
@@ -14,6 +11,18 @@ Algorithmization
   - Generating: fast code, rotate bits, CLR boundary
   - Disk crunching: orded work, prevent swaping, windows vista
   - Multi thread
-  - Prefetch
   - Test
   - Client
+  
+  
+Mike Godfrey http://cubezzz.homelinux.org/drupal/?q=node/view/77
+Mike Masonjones kickme@tampabay.rr.com
+- Jaap http://www.geocities.com/jaapsch/puzzles/square1.htm
+- Mike Masonjones, God's, http://www.geocities.com/jaapsch/puzzles/square1t.htm
+- Fred Curtis http://f2.org/maths/square1/
+http://sinac.orgfree.com/square-1/links.php
+http://www.cubezone.be/
+http://www.geocities.com/abcmcfarren/math/sq1/sq1xf.htm
+http://sinac.orgfree.com/square-1/index.php
+http://cubemania.cz/rubikova-kostka/bezflash/cube21-navod
+http://f2.org/maths/square1/

@@ -1,3 +1,8 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 
 namespace Zamboch.Cube21.Ranking
@@ -37,15 +42,15 @@ namespace Zamboch.Cube21.Ranking
             {
                 byte[] bytes = SilverRank.UnRank(index);
                 if (index != SilverRank.Rank(bytes))
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
 
                 uint bits = Unrank(index);
                 if (index != Rank(bits))
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
 
                 uint bitsex = UnrankEx(index);
                 if (index != RankEx(bitsex))
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
             }
 #endif
         }
@@ -146,11 +151,11 @@ namespace Zamboch.Cube21.Ranking
             {
                 byte[] bytes = FullRank.Unrank(index);
                 if (index != FullRank.Rank(bytes))
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
 
                 uint bits = Unrank(index);
                 if (index != Rank(bits))
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
             }
 #endif
         }

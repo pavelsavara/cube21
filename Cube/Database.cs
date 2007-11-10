@@ -1,7 +1,13 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Work;
 using Path=Zamboch.Cube21.Actions.Path;
 
@@ -215,7 +221,7 @@ namespace Zamboch.Cube21
             }
 
             sw.WriteLine();
-            Path path = new Path();
+            Path path = new Path(white);
             DumpTree((NormalShape)white.Shape, sw, path);
             sw.Close();
         }
@@ -242,7 +248,7 @@ namespace Zamboch.Cube21
             {
                 foreach (NormalShape child in shape.Childern)
                 {
-                    path.Add(child.FromParentStep);
+                    path.Add(new SmartStep(child.FromParentStep, null));
                     DumpTree(child, sw, path);
                     path.RemoveAt(path.Count - 1);
                 }

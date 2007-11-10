@@ -1,3 +1,8 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.Collections.Generic;
 using Zamboch.Cube21.Actions;
@@ -38,7 +43,7 @@ namespace Zamboch.Cube21
                     b.Minimalize();
                     int lm = b.ReadLevel();
                     if (lm != 7)
-                        throw new InvalidProgramException("LL 7");
+                        throw new InvalidProgramCubeException();
                     SmartStep ss = new SmartStep(new Step(4, 2), new Correction(10, 6));
                     b = new Cube("C479F23056A18BED");
                     c = new Cube("C479F23056A18BED");
@@ -51,7 +56,7 @@ namespace Zamboch.Cube21
                     SmartStep ss2 = normalize + ss;
                     ss2.DoAction(d);
                     if (!d.Equals(c))
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
 
                     b.ExpandToShape(18);
 
@@ -65,14 +70,14 @@ namespace Zamboch.Cube21
                             found = true;
                     }
                     if (!found)
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
 
                     b.Normalize();
                     b.Minimalize();
                     lm = c.ReadLevel();
                     
                     if (lm != 8)
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
                 }
                 c = new Cube();
                 c.Minimalize();
@@ -88,12 +93,12 @@ namespace Zamboch.Cube21
                 {
                     int ln = c.ReadLevel();
                     if (ln != 2)
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
                     c.Minimalize();
                     c.Minimalize();
                     int lm = c.ReadLevel();
                     if (lm != 2)
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
                     TestLevel(maxLevel, count);
                 }
             }
@@ -142,7 +147,7 @@ namespace Zamboch.Cube21
             Correction re = new Correction(flip, top % 12 , bot % 12);
             re.DoAction(t);
             if (!t.Equals(x))
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
                     
             SmartStep step = x.GetRandomStep(r);
             step.DoAction(x);
@@ -151,7 +156,7 @@ namespace Zamboch.Cube21
             SmartStep ss = re + step;
             ss.DoAction(u);
             if (!u.Equals(x))
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
 
 
             Cube y = new Cube(source);
@@ -180,7 +185,7 @@ namespace Zamboch.Cube21
                 }
             }
             if (!found)
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
         }
 
         private static void TestJoin(Cube a, Step s, Correction r)
@@ -195,7 +200,7 @@ namespace Zamboch.Cube21
 
             ss.DoAction(t);
             if (!t.Equals(c))
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
         }
 
         private static void TestLevel(int maxLevel, int count)
@@ -273,9 +278,7 @@ namespace Zamboch.Cube21
                 currentLevel != (lastLevel - 1) && 
                 currentLevel != lastLevel)
             {
-                int level = tested.ReadLevel();
-                string err = string.Format("Bad level {0} {1} {2}", currentLevel, lastLevel, tested);
-                throw new InvalidProgramException(err);
+                throw new InvalidProgramCubeException();
             }
         }
 
@@ -291,10 +294,9 @@ namespace Zamboch.Cube21
 
         private static void TestOnce(Random r)
         {
-            Path path = new Path();
-
             Cube c = new Cube();
             Cube y = new Cube();
+            Path path = new Path(c);
             for (int i = 0; i < 100; i++)
             {
                 Step step = new Step();
@@ -313,7 +315,7 @@ namespace Zamboch.Cube21
                 step.DoAction(y);
                 if (!c.Equals(y))
                     throw new InvalidCubeException();
-                path.Add(step);
+                path.Add(new SmartStep(step, null));
             }
 
             Cube w = new Cube();
