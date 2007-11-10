@@ -1,3 +1,8 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -177,6 +182,21 @@ namespace Zamboch.Cube21
             get { return GetPrev(bot); }
         }
 
+        public int PositionOf(Piece piece)
+        {
+            for(int t=0;t<12;t++)
+            {
+                if (top[t]==piece)
+                    return t;
+            }
+            for (int b = 0; b < 12; b++)
+            {
+                if (bot[b] == piece)
+                    return b + 12;
+            }
+            throw new InvalidProgramCubeException();
+        }
+
         #endregion
 
         #region Active Operations
@@ -212,7 +232,7 @@ namespace Zamboch.Cube21
                 correction.DoAction(candidate);
 #if DEBUG
                 if (candidate.Shape != Shape)
-                    throw new InvalidProgramException();
+                    throw new InvalidProgramCubeException();
 #endif
                 candidate.GetIndexes(out bigIndexCorr, out smallIndexCorr);
 
@@ -277,7 +297,7 @@ namespace Zamboch.Cube21
         public void Turn()
         {
             if (!CheckTurn(0, top) || !CheckTurn(0, bot))
-                throw new NonFlipableCubeException();
+                throw new NonTunableCubeException();
             TurnImlementation();
             shape = null;
         }
@@ -288,7 +308,7 @@ namespace Zamboch.Cube21
         public void Flip()
         {
             if (!CheckTurn(0, top) || !CheckTurn(0, bot))
-                throw new NonFlipableCubeException();
+                throw new NonTunableCubeException();
             FlipImlementation();
             shape = null;
         }
@@ -380,7 +400,7 @@ namespace Zamboch.Cube21
         public void CheckFlipable()
         {
             if (!CheckTurn(0, top) || !CheckTurn(0, bot))
-                throw new NonFlipableCubeException();
+                throw new NonTunableCubeException();
         }
 
         public void CheckPieces()
@@ -586,7 +606,7 @@ namespace Zamboch.Cube21
                 return source;
 #if DEBUG
             if (!CheckTurn(shift, source))
-                throw new NonFlipableCubeException();
+                throw new NonTunableCubeException();
 #endif
             Piece[] temp = new Piece[12];
             int rest = 12 - shift;
@@ -594,7 +614,7 @@ namespace Zamboch.Cube21
             Array.Copy(source, rest, temp, 0, shift);
 #if DEBUG
             if (!CheckTurn(0, temp))
-                throw new NonFlipableCubeException();
+                throw new NonTunableCubeException();
 #endif
             return temp;
         }
@@ -606,6 +626,11 @@ namespace Zamboch.Cube21
         public override string ToString()
         {
             return PieceHelper.ToString(top) + "-" + PieceHelper.ToString(bot);
+        }
+
+        public string ToStringShort()
+        {
+            return PieceHelper.ToString(top) + PieceHelper.ToString(bot);
         }
 
         public string TopToString()
@@ -727,7 +752,7 @@ namespace Zamboch.Cube21
         public Path FindWayHome()
         {
             Cube temp=new Cube(this);
-            Path path=new Path();
+            Path path=new Path(temp);
             while (!temp.Equals(Database.white))
             {
                 SmartStep step = temp.FindStepHome();
@@ -735,6 +760,38 @@ namespace Zamboch.Cube21
                     break;
                 path.Add(step);
                 step.DoAction(temp);
+            }
+            int t = temp.PositionOf(Piece.STS0_0);
+            int b = temp.PositionOf(Piece.SBS0_8)-12;
+            Correction correction;
+            if (t > 12)
+            {
+                temp.Flip();
+                t = temp.PositionOf(Piece.STS0_0);
+                b = temp.PositionOf(Piece.SBS0_8) - 12;
+                correction = new Correction((24 - t) % 12, (24 - b) % 12);
+                correction.DoAction(temp);
+                correction.Flip = true;
+            }
+            else
+            {
+                correction = new Correction((24 - t) % 12, (24 - b) % 12);
+                correction.DoAction(temp);
+            }
+
+            if (path.Count > 0)
+            {
+                SmartStep step = path[path.Count - 1];
+                if (step.Correction == null)
+                    step.Correction = correction;
+                else
+                {
+                    step.Correction = step.Correction + correction;
+                }
+            }
+            else if (correction.TopShift!=0 || correction.BotShift!=0 || correction.Flip)
+            {
+                path.Add(new SmartStep(null, correction));
             }
             path.Compress();
             return path;
@@ -778,7 +835,7 @@ namespace Zamboch.Cube21
             if (!test.Equals(normal))
             {
                 SmartStep res2 = normalize + minimalize + nextStep;
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
             }
 #endif 
             return res;
@@ -808,7 +865,7 @@ namespace Zamboch.Cube21
                 if (newLevel==0)
                 {
                     if (Database.instance.IsExplored)
-                        throw new InvalidProgramException();
+                        throw new InvalidProgramCubeException();
                 }
                 else
                 {
@@ -824,7 +881,7 @@ namespace Zamboch.Cube21
                             SmartStep step2 = normalize + minimalize + nextStep;
                             Cube test2 = new Cube(this);
                             step2.DoAction(test2);
-                            throw new InvalidProgramException();
+                            throw new InvalidProgramCubeException();
                         }
 #endif
 
@@ -839,9 +896,5 @@ namespace Zamboch.Cube21
 
         #endregion
 
-        public override bool Equals(object obj)
-        {
-            return ToString() == obj.ToString();
-        }
     }
 }

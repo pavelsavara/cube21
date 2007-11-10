@@ -1,4 +1,12 @@
-﻿namespace Zamboch.Cube21
+﻿// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
+// Names taken from http://www.geocities.com/jaapsch/puzzles/square1.htm
+// And extended by me
+
+namespace Zamboch.Cube21
 {
 
     /// <summary>

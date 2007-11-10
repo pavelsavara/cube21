@@ -1,0 +1,7 @@
+ - Midle layer is not solved by database, could it be solved on top of path from database ?
+ - better error mesage when invalid cube entered
+ - hosting for database
+ - webservice for database
+ - connected 
+ - wizard for entering cube
+ - alow to enter non-turnable cube

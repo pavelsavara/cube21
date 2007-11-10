@@ -37,7 +37,7 @@ namespace Viewer
             TrackBall.EventSource = CaptureBorder;
             cube.OnBeforeAnimation += OnBeforeAnimation;
             cube.OnAfterAnimation += OnAfterAnimation;
-            path = new Path();
+            path = new Path(cube.Cube);
             DumpInfo(cube.Cube);
             if (DatabaseManager.DatabaseLocal)
                 mnuGenerate.Visibility = Visibility.Collapsed;
@@ -67,17 +67,35 @@ namespace Viewer
             else
             {
                 SmartStep step = (SmartStep)path[0];
-                if (step.Step.TopShift!=0)
+                if (step.Step != null)
                 {
-                    cube.RotateTop(step.Step.TopShift);
+                    if (step.Step.TopShift != 0)
+                    {
+                        cube.RotateTop(step.Step.TopShift);
+                    }
+                    else if (step.Step.BotShift != 0)
+                    {
+                        cube.RotateBot(step.Step.BotShift);
+                    }
+                    else if (step.Step.BotShift == 0 && step.Step.TopShift == 0)
+                    {
+                        cube.Turn();
+                    }
                 }
-                else if (step.Step.BotShift!=0)
+                else if (step.Correction!=null)
                 {
-                    cube.RotateBot(step.Step.BotShift);
-                }
-                else if (step.Step.BotShift==0 && step.Step.TopShift==0)
-                {
-                    cube.Turn();
+                    if (step.Correction.Flip)
+                    {
+                        cube.Flip();
+                    }
+                    else if (step.Correction.TopShift!=0)
+                    {
+                        cube.RotateTop(step.Correction.TopShift);
+                    }
+                    else if (step.Correction.BotShift != 0)
+                    {
+                        cube.RotateBot(step.Correction.BotShift);
+                    }
                 }
             }
         }
@@ -105,15 +123,26 @@ namespace Viewer
             try
             {
                 Cube n = new Cube(textBoxTop.Text + textBoxBot.Text);
+                n.CheckFlipable();
+                n.CheckPieces();
                 path = n.FindWayHome();
+                path.FlipMiddle(cube.MiddleLeft, cube.MiddleRight);
                 DumpInfo(n);
                 cube.Cube = n;
+                cube.MiddleRight = false;
+                cube.MiddleLeft = false;
                 cube.Refresh();
             }
             catch(Exception)
             {
                 MessageBox.Show("Invalid cube");
             }
+        }
+
+        private void buttonFlipMiddle_Click(object sender, RoutedEventArgs e)
+        {
+            cube.MiddleRight = !cube.MiddleRight;
+            cube.Refresh();
         }
 
         private void mnuGenerate_Click(object sender, RoutedEventArgs e)
@@ -225,6 +254,7 @@ namespace Viewer
         {
             buttonsEnabled = true;
             path = cube.Cube.FindWayHome();
+            path.FlipMiddle(cube.MiddleLeft, cube.MiddleRight);
             DumpInfo(cube.Cube);
             if (solving)
                 StepHome();
@@ -254,7 +284,30 @@ namespace Viewer
 
         #endregion
 
+        private void buttonRandomStep_Click(object sender, RoutedEventArgs e)
+        {
+            int x = 3;
+            do
+            {
+                int next = r.Next(x);
+                switch (next)
+                {
+                    case 0:
+                        cube.RotateNextTop();
+                        break;
+                    case 1:
+                        cube.RotateNextBot();
+                        break;
+                    case 2:
+                        cube.Turn();
+                        return;
+                    default:
+                        return;
+                }
+                x++;
+            } while (x > 7);
+        }
 
-
+        Random r = new Random();
     }
 }

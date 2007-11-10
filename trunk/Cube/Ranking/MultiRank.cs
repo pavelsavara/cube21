@@ -1,3 +1,11 @@
+// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
+// Algorithm by Pavel Savara 2007
+// Mode info http://zamboch.blogspot.com/2007/10/ranking-permutations-of-multiset-more.html
+
 using System;
 
 namespace Zamboch.Cube21.Ranking

@@ -1,4 +1,9 @@
-﻿using System;
+﻿// This file is part of project Cube21
+// Whole solution including its LGPL license could be found at
+// http://cube21.sf.net/
+// 2007 Pavel Savara, http://zamboch.blogspot.com/
+
+using System;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
@@ -234,8 +239,8 @@ namespace Viewer
                 if (PieceHelper.IsBig(piece))
                     position++;
             }
-            content.Children.Add(CreatePiece(Piece.MIDS_G, MiddleRight ? 13 : 0));
-            content.Children.Add(CreatePiece(Piece.MIDY_H, MiddleLeft ? 19 : 6));
+            content.Children.Add(CreatePiece(Piece.MIDS_G, MiddleRight ? 12 : 0));
+            content.Children.Add(CreatePiece(Piece.MIDY_H, MiddleLeft ? 18 : 6));
 
             FrontModel.Content = content;
             BackModel.Content = content;
@@ -275,7 +280,7 @@ namespace Viewer
             }
             else
             {
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
             }
 
             AxisAngleRotation3D rotation = new AxisAngleRotation3D(new Vector3D(0, 0, 1), rotationAngle);
@@ -319,7 +324,7 @@ namespace Viewer
             }
             else
             {
-                throw new InvalidProgramException();
+                throw new InvalidProgramCubeException();
             }
             rotationAngle %= 360;
         }
