@@ -39,8 +39,8 @@ namespace Zamboch.Cube21.Work
             }
             else
             {
-                if (Database == null)
-                    Database = new Database();
+                Database.Reset();
+                Database = new Database();
                 SearchShapes();
                 AssignShapeIds();
                 Database.normalShapes.Sort();

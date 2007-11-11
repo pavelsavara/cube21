@@ -105,16 +105,21 @@ namespace Zamboch.Cube21
                 databaseSerializer.Serialize(sw, this);
             }
         }
+        
+        public static void Reset()
+        {
+            white = new Cube();
+            whiteShape = null;
+            shapeNormalizer = new Dictionary<uint, Shape>();
+            shapeIndexes = new Dictionary<int, Shape>();
+            halfShapeNormalizer = new Dictionary<uint, HalfShape>();
+        }
 
         public static Database Load(bool register)
         {
             if (register)
             {
-                white = new Cube();
-                whiteShape = null;
-                shapeNormalizer = new Dictionary<uint, Shape>();
-                shapeIndexes = new Dictionary<int, Shape>();
-                halfShapeNormalizer = new Dictionary<uint, HalfShape>();
+                Reset();
             }
             using (StreamReader sr = new StreamReader(databaseFile))
             {
