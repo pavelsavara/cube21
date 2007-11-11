@@ -1,0 +1,27 @@
+<publishData>
+  <publishTarget publishUrl="http://localhost:8088/">
+    <file relUrl="Web.config" publishTime="11/11/2007 21:05:40" />
+    <file relUrl="Cube21Service.svc" publishTime="11/11/2007 13:09:16" />
+    <file relUrl="bin/Cube.pdb" publishTime="11/11/2007 20:59:29" />
+    <file relUrl="bin/Server.pdb" publishTime="11/11/2007 21:07:54" />
+    <file relUrl="bin/Cube.exe" publishTime="11/11/2007 20:59:29" />
+    <file relUrl="bin/Server.dll" publishTime="11/11/2007 21:07:54" />
+  </publishTarget>
+  <publishTarget publishUrl="http://localhost/Cube21Service/">
+    <file relUrl="Web.config" publishTime="11/11/2007 15:17:53" />
+    <file relUrl="Cube21Service.svc" publishTime="11/11/2007 13:09:16" />
+    <file relUrl="bin/Cube.pdb" publishTime="11/11/2007 20:51:13" />
+    <file relUrl="bin/Server.pdb" publishTime="11/11/2007 20:51:14" />
+    <file relUrl="bin/Cube.exe" publishTime="11/11/2007 20:51:14" />
+    <file relUrl="bin/Server.dll" publishTime="11/11/2007 20:51:14" />
+  </publishTarget>
+  <publishTarget publishUrl="http://localhost/">
+    <file relUrl="Cube21Service.svc" publishTime="11/11/2007 13:09:16" />
+    <file relUrl="WebService1.asmx" publishTime="11/11/2007 13:21:35" />
+    <file relUrl="bin/Server.dll" publishTime="11/11/2007 18:32:20" />
+    <file relUrl="bin/Cube.pdb" publishTime="11/11/2007 15:48:54" />
+    <file relUrl="bin/Server.pdb" publishTime="11/11/2007 18:32:20" />
+    <file relUrl="bin/Cube.exe" publishTime="11/11/2007 15:48:55" />
+    <file relUrl="Web.config" publishTime="11/11/2007 15:17:53" />
+  </publishTarget>
+</publishData>

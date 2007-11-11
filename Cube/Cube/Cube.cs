@@ -11,10 +11,14 @@ using System.Xml.Schema;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Ranking;
 using Zamboch.Cube21.Work;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+
 
 namespace Zamboch.Cube21
 {
-    public class Cube : IXmlSerializable
+    [DataContract]
+    public class Cube 
     {
         #region Data
 
@@ -59,6 +63,7 @@ namespace Zamboch.Cube21
 
         #region Properties
 
+        [XmlIgnore]
         public Piece[] TopPieces
         {
             get
@@ -67,6 +72,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public Piece[] BotPieces
         {
             get
@@ -75,6 +81,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public int SmallIndex
         {
             get
@@ -86,6 +93,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public int BigIndex
         {
             get
@@ -97,6 +105,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public uint BigBits
         {
             get
@@ -108,6 +117,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public uint SmallBits
         {
             get
@@ -119,16 +129,19 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public int ShapeIndex
         {
             get { return Shape.ShapeIndex; }
         }
 
+        [XmlIgnore]
         public bool IsNormalShape
         {
             get { return Shape.IsNormal; }
         }
 
+        [XmlIgnore]
         public uint ShapeBits
         {
             get
@@ -139,6 +152,7 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public Shape Shape
         {
             get
@@ -150,6 +164,7 @@ namespace Zamboch.Cube21
             set { shape = value; }
         }
 
+        [XmlIgnore]
         public NormalShape NormalShape
         {
             get
@@ -162,21 +177,25 @@ namespace Zamboch.Cube21
             }
         }
 
+        [XmlIgnore]
         public int NextTop
         {
             get { return GetNext(top); }
         }
 
+        [XmlIgnore]
         public int NextBot
         {
             get { return GetNext(bot); }
         }
 
+        [XmlIgnore]
         public int PrevTop
         {
             get { return GetPrev(top); }
         }
 
+        [XmlIgnore]
         public int PrevBot
         {
             get { return GetPrev(bot); }
@@ -606,7 +625,10 @@ namespace Zamboch.Cube21
                 return source;
 #if DEBUG
             if (!CheckTurn(shift, source))
+            {
+                CheckTurn(shift, source);
                 throw new NonTunableCubeException();
+            }
 #endif
             Piece[] temp = new Piece[12];
             int rest = 12 - shift;
@@ -653,22 +675,18 @@ namespace Zamboch.Cube21
             return true;
         }
 
-        XmlSchema IXmlSerializable.GetSchema()
+        [XmlAttribute("Perm")]
+        [DataMember]
+        public string CubePermutation
         {
-            return null;
-        }
-
-        void IXmlSerializable.ReadXml(XmlReader reader)
-        {
-            reader.MoveToElement();
-            string form = reader.ReadElementContentAsString();
-            PieceHelper.ToForm(form, out top, out bot);
-        }
-
-        void IXmlSerializable.WriteXml(XmlWriter writer)
-        {
-            string form = PieceHelper.ToString(top) + PieceHelper.ToString(bot);
-            writer.WriteString(form);
+            get
+            {
+                return PieceHelper.ToString(top) + PieceHelper.ToString(bot);
+            }
+            set
+            {
+                PieceHelper.ToForm(value, out top, out bot);
+            }
         }
 
         #endregion
@@ -764,14 +782,15 @@ namespace Zamboch.Cube21
             int t = temp.PositionOf(Piece.STS0_0);
             int b = temp.PositionOf(Piece.SBS0_8)-12;
             Correction correction;
-            if (t > 12)
+            if (t >= 12)
             {
-                temp.Flip();
-                t = temp.PositionOf(Piece.STS0_0);
-                b = temp.PositionOf(Piece.SBS0_8) - 12;
+                Cube flip = new Cube(temp);
+                flip.Flip();
+                t = flip.PositionOf(Piece.STS0_0);
+                b = flip.PositionOf(Piece.SBS0_8) - 12;
                 correction = new Correction((24 - t) % 12, (24 - b) % 12);
-                correction.DoAction(temp);
                 correction.Flip = true;
+                correction.DoAction(temp);
             }
             else
             {

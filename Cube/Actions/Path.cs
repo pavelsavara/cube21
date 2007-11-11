@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Zamboch.Cube21.Actions
@@ -12,14 +13,19 @@ namespace Zamboch.Cube21.Actions
     public class Path : List<SmartStep>
     {
         public Cube From;
-        public Path(Cube from)
+
+        public Path()
         {
-            From=new Cube(from);
         }
 
-        public Path Invert()
+        public Path(IEnumerable<SmartStep> source)
         {
-            throw new NotImplementedException();
+            AddRange(source);
+        }
+
+        public Path(Cube from)
+        {
+            From = new Cube(from);
         }
 
         //doesn't work well
@@ -74,8 +80,11 @@ namespace Zamboch.Cube21.Actions
                  */
             }
 #if DEBUG
-            Cube test = new Cube(From);
-            DoActions(test);
+            if (From != null)
+            {
+                Cube test = new Cube(From);
+                DoActions(test);
+            }
 #endif
         }
 

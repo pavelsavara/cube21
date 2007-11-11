@@ -5,10 +5,12 @@
 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Actions
 {
+    [DataContract]
     public class Correction : Action
     {
         public Correction()
@@ -63,6 +65,7 @@ namespace Zamboch.Cube21.Actions
 
         // turn after shifts
         [XmlAttribute()]
+        [DataMember]
         public bool Flip;
 
         public override void DoAction(Cube cube)

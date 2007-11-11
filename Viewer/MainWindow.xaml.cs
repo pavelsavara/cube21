@@ -5,8 +5,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Threading;
 using _3DTools;
+using Viewer.Properties;
+using System.Windows.Forms;
 using Zamboch.Cube21;
 using Zamboch.Cube21.Actions;
 using Zamboch.Cube21.Engine;
@@ -25,23 +27,21 @@ namespace Viewer
 
         public MainWindow()
         {
-            DatabaseExt m = new DatabaseExt();
+            DatabaseExt m = new DatabaseExt(Settings.Default.DatabasePath);
             m.Initialize();
             DatabaseExt.Instance.IsMapped = false;
             InitializeComponent();
-            cube = new VisualCube(new Cube());
-            mainViewport.Children.Add(cube.FrontModel);
-            backViewport.Children.Add(cube.BackModel);
-            cube.FrontModel.Transform = TrackBall.Transform;
-            cube.BackModel.Transform = TrackBall.Transform;
+            visualCube = new VisualCube(new Cube());
+            mainViewport.Children.Add(visualCube.FrontModel);
+            backViewport.Children.Add(visualCube.BackModel);
+            visualCube.FrontModel.Transform = TrackBall.Transform;
+            visualCube.BackModel.Transform = TrackBall.Transform;
             TrackBall.EventSource = CaptureBorder;
-            cube.OnBeforeAnimation += OnBeforeAnimation;
-            cube.OnAfterAnimation += OnAfterAnimation;
-            path = new Path(cube.Cube);
-            DumpInfo(cube.Cube);
-            if (DatabaseManager.DatabaseLocal)
-                mnuGenerate.Visibility = Visibility.Collapsed;
-
+            visualCube.OnBeforeAnimation += OnBeforeAnimation;
+            visualCube.OnAfterAnimation += OnAfterAnimation;
+            path = new Path(visualCube.Cube);
+            DumpInfo(visualCube.Cube);
+            UpdateMenu();
         }
 
         private void DumpInfo(Cube cube)
@@ -62,46 +62,58 @@ namespace Viewer
             if (path.Count == 0)
             {
                 solving = false;
-                buttonSolve.IsEnabled = true;
+                buttonSolve.IsEnabled = false;
+                buttonSolveStep.IsEnabled = false;
             }
             else
             {
-                SmartStep step = (SmartStep)path[0];
+                SmartStep step = path[0];
                 if (step.Step != null)
                 {
                     if (step.Step.TopShift != 0)
                     {
-                        cube.RotateTop(step.Step.TopShift);
+                        visualCube.RotateTop(step.Step.TopShift);
+                        step.Step.TopShift = 0;
                     }
                     else if (step.Step.BotShift != 0)
                     {
-                        cube.RotateBot(step.Step.BotShift);
+                        visualCube.RotateBot(step.Step.BotShift);
+                        step.Step.BotShift = 0;
                     }
                     else if (step.Step.BotShift == 0 && step.Step.TopShift == 0)
                     {
-                        cube.Turn();
+                        visualCube.Turn();
+                        step.Step = null;
                     }
                 }
                 else if (step.Correction!=null)
                 {
                     if (step.Correction.Flip)
                     {
-                        cube.Flip();
+                        visualCube.Flip();
+                        step.Correction.Flip = false;
                     }
                     else if (step.Correction.TopShift!=0)
                     {
-                        cube.RotateTop(step.Correction.TopShift);
+                        visualCube.RotateTop(step.Correction.TopShift);
+                        step.Correction.TopShift = 0;
                     }
                     else if (step.Correction.BotShift != 0)
                     {
-                        cube.RotateBot(step.Correction.BotShift);
+                        visualCube.RotateBot(step.Correction.BotShift);
+                        step.Correction.BotShift = 0;
                     }
+                    if (step.Correction.TopShift == 0 && step.Correction.BotShift==0 && !step.Correction.Flip)
+                    {
+                        step.Correction = null;
+                    }
+                }
+                if (step.Step==null && step.Correction==null)
+                {
+                    path.RemoveAt(0);
                 }
             }
         }
-
-        private Path path;
-        private bool solving;
 
         #endregion
 
@@ -118,6 +130,32 @@ namespace Viewer
             StepHome();
         }
 
+        private void mnuConnect_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.UseLocal = !Settings.Default.UseLocal;
+            UpdateMenu();
+        }
+
+        private void UpdateMenu()
+        {
+            if (Settings.Default.UseLocal)
+            {
+                mnuConnect.Header = "Conect";
+            }
+            else
+            {
+                mnuConnect.Header = "Use Local";
+            }
+            if (Settings.Default.LocalReady)
+            {
+                mnuGenerate.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                mnuConnect.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void buttonCreate_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -125,13 +163,12 @@ namespace Viewer
                 Cube n = new Cube(textBoxTop.Text + textBoxBot.Text);
                 n.CheckFlipable();
                 n.CheckPieces();
-                path = n.FindWayHome();
-                path.FlipMiddle(cube.MiddleLeft, cube.MiddleRight);
+                visualCube.Cube = n;
+                visualCube.MiddleRight = false;
+                visualCube.MiddleLeft = false;
+                UpdatePath();
                 DumpInfo(n);
-                cube.Cube = n;
-                cube.MiddleRight = false;
-                cube.MiddleLeft = false;
-                cube.Refresh();
+                visualCube.Refresh();
             }
             catch(Exception)
             {
@@ -141,8 +178,8 @@ namespace Viewer
 
         private void buttonFlipMiddle_Click(object sender, RoutedEventArgs e)
         {
-            cube.MiddleRight = !cube.MiddleRight;
-            cube.Refresh();
+            visualCube.MiddleRight = !visualCube.MiddleRight;
+            visualCube.Refresh();
         }
 
         private void mnuGenerate_Click(object sender, RoutedEventArgs e)
@@ -162,6 +199,9 @@ namespace Viewer
                         Directory.CreateDirectory(dlg.SelectedPath);
                     mnuGenerate.Visibility = System.Windows.Visibility.Collapsed;
                     DatabaseManager.DatabasePath = dlg.SelectedPath;
+                    Settings.Default.DatabasePath = dlg.SelectedPath;
+                    Settings.Default.Save();
+                    DatabaseManager.instance.Initialize();
                     Thread mainThread = new Thread(engine);
                     mainThread.Start();
                 }
@@ -174,34 +214,89 @@ namespace Viewer
             {
                 AllocConsole();
                 DatabaseExt.Instance.IsMapped = true;
-                DatabaseExt.Main();
-                DatabaseExt.Instance.IsMapped = false;
+                if (DatabaseManager.instance.Explore())
+                {
+                    DatabaseManager.CloseAll();
+                    DatabaseExt.Instance.IsMapped = false;
+                    Test.TestData(12, 1000);
+                }
+                else
+                {
+                    DatabaseExt.Instance.IsMapped = false;
+                }
             }
             finally
             {
+                Dispatcher.Invoke(DispatcherPriority.Normal, new AfterEngine(afterEngine));
                 FreeConsole();
-                if (Directory.Exists(DatabaseManager.DatabasePath))
+            }
+        }
+
+        private delegate void AfterEngine();
+
+        private void afterEngine()
+        {
+            if (Directory.Exists(DatabaseManager.DatabasePath))
+            {
+                Database d = Database.Load(false);
+                if (d.IsExplored)
                 {
-                    Database d = Database.Load(false);
-                    if (d.IsExplored)
-                    {
-                        DatabaseManager.DatabaseLocal = true;
-                    }
-                    else
-                    {
-                        mnuGenerate.Visibility = System.Windows.Visibility.Visible;
-                    }
+                    Settings.Default.LocalReady = true;
+                    Settings.Default.Save();
                 }
                 else
                 {
                     mnuGenerate.Visibility = System.Windows.Visibility.Visible;
                 }
             }
+            else
+            {
+                mnuGenerate.Visibility = System.Windows.Visibility.Visible;
+            }
         }
 
-        private void mnuClose_Click(object sender, RoutedEventArgs e)
+        private void buttonRandomStep_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (!buttonsEnabled) return;
+            randomizing = 1;
+            RandomStep();
+        }
+
+        private void buttonRandom_Click(object sender, RoutedEventArgs e)
+        {
+            if (!buttonsEnabled) return;
+            randomizing = 15;
+            RandomStep();
+        }
+
+        private void RandomStep()
+        {
+            if (randomizing == 0)
+                return;
+            randomizing--;
+            int x = 3;
+            do
+            {
+                int next = r.Next(x);
+                switch (next)
+                {
+                    case 0:
+                        visualCube.RotateNextTop();
+                        break;
+                    case 1:
+                        visualCube.RotateNextBot();
+                        break;
+                    case 2:
+                        visualCube.Turn();
+                        UpdatePath();
+                        return;
+                    default:
+                        UpdatePath();
+                        return;
+                }
+                x++;
+            } while (x > 7);
+            UpdatePath();
         }
 
         private void buttonTopReset_Click(object sender, RoutedEventArgs e)
@@ -217,47 +312,66 @@ namespace Viewer
         private void buttonFlip_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.Flip();
+            visualCube.Flip();
+            UpdatePath();
         }
 
         private void buttonTurn_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.Turn();
+            visualCube.Turn();
+            UpdatePath();
         }
 
         private void buttonBottomRight_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.RotateNextBot();
+            visualCube.RotateNextBot();
+            UpdatePath();
         }
 
         private void topTopRight_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.RotateNextTop();
+            visualCube.RotateNextTop();
+            UpdatePath();
         }
 
         private void buttonBottomLeft_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.RotatePrevBot();
+            visualCube.RotatePrevBot();
+            UpdatePath();
         }
 
         private void buttonTopLeft_Click(object sender, RoutedEventArgs e)
         {
             if (!buttonsEnabled) return;
-            cube.RotatePrevTop();
+            visualCube.RotatePrevTop();
+            UpdatePath();
         }
 
         private void OnAfterAnimation()
         {
             buttonsEnabled = true;
-            path = cube.Cube.FindWayHome();
-            path.FlipMiddle(cube.MiddleLeft, cube.MiddleRight);
-            DumpInfo(cube.Cube);
+            DumpInfo(visualCube.Cube);
             if (solving)
                 StepHome();
+            if (randomizing>0)
+                RandomStep();
+        }
+
+        private void UpdatePath()
+        {
+            visualCube.Cube.CheckPieces();
+            visualCube.Cube.CheckFlipable();
+            if (randomizing==0)
+                path = DatabaseProxy.FindWayHome(visualCube.Cube);
+            if (path.Count > 0)
+            {
+                buttonSolve.IsEnabled = true;
+                buttonSolveStep.IsEnabled = true;
+            }
         }
 
         private void OnBeforeAnimation()
@@ -269,9 +383,13 @@ namespace Viewer
 
         #region Variables
 
+        private Path path;
+        private bool solving;
+        private int randomizing;
         private bool buttonsEnabled = true;
         private Trackball TrackBall = new Trackball();
-        private VisualCube cube;
+        private VisualCube visualCube;
+        private Random r = new Random();
 
         #endregion
 
@@ -284,30 +402,5 @@ namespace Viewer
 
         #endregion
 
-        private void buttonRandomStep_Click(object sender, RoutedEventArgs e)
-        {
-            int x = 3;
-            do
-            {
-                int next = r.Next(x);
-                switch (next)
-                {
-                    case 0:
-                        cube.RotateNextTop();
-                        break;
-                    case 1:
-                        cube.RotateNextBot();
-                        break;
-                    case 2:
-                        cube.Turn();
-                        return;
-                    default:
-                        return;
-                }
-                x++;
-            } while (x > 7);
-        }
-
-        Random r = new Random();
     }
 }

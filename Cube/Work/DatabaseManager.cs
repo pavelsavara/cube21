@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Zamboch.Cube21.Properties;
 using Zamboch.Cube21.Ranking;
 
 namespace Zamboch.Cube21.Work
@@ -16,11 +15,12 @@ namespace Zamboch.Cube21.Work
     {
         #region Construction & singleton
 
-        public DatabaseManager()
+        public DatabaseManager(string PathToDatabase)
         {
             if (instance != null)
                 throw new InvalidOperationException();
             instance = this;
+            DatabaseManager.DatabasePath = PathToDatabase;
 
             MEMORYSTATUSEX ms = new MEMORYSTATUSEX();
             ms.dwLength = (uint)Marshal.SizeOf(ms);
@@ -35,6 +35,7 @@ namespace Zamboch.Cube21.Work
 
         #region Data
 
+        public static string DatabasePath = @"C:\Cube21";
         public static WorkQueue WorkQueue;
         public static DatabaseManager instance;
 
@@ -42,33 +43,6 @@ namespace Zamboch.Cube21.Work
         {
             get { return WorkQueue.ThisLevelWork; }
             set { WorkQueue.ThisLevelWork = value; }
-        }
-
-        private static Settings settings = new Settings();
-        public static string DatabasePath
-        {
-            get
-            {
-                return settings.DatabasePath;
-            }
-            set
-            {
-                settings.DatabasePath = value;
-                settings.Save();
-            }
-        }
-
-        public static bool DatabaseLocal
-        {
-            get
-            {
-                return settings.DatabaseLocal;
-            }
-            set
-            {
-                settings.DatabaseLocal = value;
-                settings.Save();
-            }
         }
 
         public static int SourceLevel
@@ -137,6 +111,8 @@ namespace Zamboch.Cube21.Work
             {
                 ShapeLoader loader = GetShapeLoader(shape.ShapeIndex);
                 loader.Close();
+                shape.Loader = null;
+                shape.Pages=new List<Page>();
             }
         }
 
@@ -179,10 +155,7 @@ namespace Zamboch.Cube21.Work
                 if (!DoWork())
                     return false;
                 Database.IsExplored = true;
-                foreach (NormalShape normalShape in Database.NormalShapes)
-                {
-                    normalShape.Pages = null;
-                }
+                CloseAll();
                 return true;
             }
             catch (Exception ex)

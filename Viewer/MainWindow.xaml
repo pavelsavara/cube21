@@ -15,6 +15,7 @@
 		<Menu Grid.Column="0" Grid.ColumnSpan="2" Height="22" Name="mainMenu" >
 			<MenuItem Name="mnuDatabase" Header="Database" >
 				<MenuItem Name="mnuGenerate" Header="Generate" Click="mnuGenerate_Click"/>
+				<MenuItem Name="mnuConnect" Header="Connect" Click="mnuConnect_Click"/>
 			</MenuItem>
 		</Menu>
 
@@ -148,5 +149,6 @@
 		<Button Grid.Column="1" Grid.Row="1" Margin="15,261,11,0" Name="buttonSolveStep" Height="21" VerticalAlignment="Top" Click="buttonSolveStep_Click">Solve Step</Button>
 		<Button Grid.Column="1" Grid.Row="1" Margin="15,291,11,0" Name="buttonFlipMiddle" Height="21" VerticalAlignment="Top" Click="buttonFlipMiddle_Click">Flip Middle</Button>
 		<Button Grid.Column="1" Grid.Row="1" Margin="15,321,11,0" Name="buttonRandomStep" Height="21" VerticalAlignment="Top" Click="buttonRandomStep_Click">Random Step</Button>
+		<Button Grid.Column="1" Grid.Row="1" Margin="15,351,11,0" Name="buttonRandom" Height="21" VerticalAlignment="Top" Click="buttonRandom_Click">Random Moves</Button>
 	</Grid>
 </Window>

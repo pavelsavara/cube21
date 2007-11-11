@@ -5,10 +5,12 @@
 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace Zamboch.Cube21.Actions
 {
     [Serializable]
+    [DataContract]
     public class Step : Action
     {
         #region Construction

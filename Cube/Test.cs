@@ -14,12 +14,13 @@ namespace Zamboch.Cube21
     {
         public static void Main()
         {
-            DatabaseManager manager = new DatabaseManager();
+            DatabaseManager manager = new DatabaseManager(@"D:\Cube21");
             manager.Initialize();
             if (Database.instance.IsExplored)
             {
                 TestActions();
                 TestData(13, 100000);
+                DatabaseManager.CloseAll();
             }
             else
             {
@@ -121,7 +122,7 @@ namespace Zamboch.Cube21
 
             foreach (NormalShape normalShape in Database.NormalShapes)
             {
-                for (int i=0;i<1000;i++)
+                for (int i=0;i<100;i++)
                 {
                     Cube source = normalShape.ExampleCube;
                     TestCube(source, r);
@@ -280,61 +281,6 @@ namespace Zamboch.Cube21
             {
                 throw new InvalidProgramCubeException();
             }
-        }
-
-        public static void TestPath()
-        {
-            Random r = new Random();
-
-            for (int i = 0; i < 100; i++)
-            {
-                TestOnce(r);
-            }
-        }
-
-        private static void TestOnce(Random r)
-        {
-            Cube c = new Cube();
-            Cube y = new Cube();
-            Path path = new Path(c);
-            for (int i = 0; i < 100; i++)
-            {
-                Step step = new Step();
-                int tt = r.Next(10);
-                for (int t = 0; t < tt; t++)
-                {
-                    step.TopShift += c.RotateNextTop();
-                }
-                int bb = r.Next(10);
-                for (int b = 0; b < bb; b++)
-                {
-                    step.BotShift += c.RotateNextBot();
-                }
-                c.Turn();
-                step.Normalize();
-                step.DoAction(y);
-                if (!c.Equals(y))
-                    throw new InvalidCubeException();
-                path.Add(new SmartStep(step, null));
-            }
-
-            Cube w = new Cube();
-
-            Cube x = new Cube();
-            path.DoActions(x);
-            if (!c.Equals(x))
-                throw new InvalidCubeException();
-
-            Cube d = new Cube(c);
-            path.UndoActions(d);
-            if (!w.Equals(d))
-                throw new InvalidCubeException();
-
-            Path pb = path.Invert();
-            Cube e = new Cube(c);
-            pb.DoActions(e);
-            if (!w.Equals(e))
-                throw new InvalidCubeException();
         }
     }
 }
