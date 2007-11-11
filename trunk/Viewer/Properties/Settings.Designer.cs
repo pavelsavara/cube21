@@ -8,21 +8,42 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.Configuration;
-
-namespace Zamboch.Cube21.Properties {
+namespace Viewer.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "9.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
         public static Settings Default {
             get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseLocal {
+            get {
+                return ((bool)(this["UseLocal"]));
+            }
+            set {
+                this["UseLocal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://cube21.no-ip.org:8088/Cube21Service.svc")]
+        public string WebService {
+            get {
+                return ((string)(this["WebService"]));
+            }
+            set {
+                this["WebService"] = value;
             }
         }
         
@@ -41,12 +62,12 @@ namespace Zamboch.Cube21.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool DatabaseLocal {
+        public bool LocalReady {
             get {
-                return ((bool)(this["DatabaseLocal"]));
+                return ((bool)(this["LocalReady"]));
             }
             set {
-                this["DatabaseLocal"] = value;
+                this["LocalReady"] = value;
             }
         }
     }

@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -15,14 +16,17 @@ namespace Zamboch.Cube21.Actions
     /// </summary>
     [XmlInclude(typeof(Correction))]
     [XmlInclude(typeof(Step))]
+    [DataContract]
     public abstract class Action : IAction
     {
         #region Data
 
         [XmlAttribute("Top")]
+        [DataMember]
         public int TopShift;
 
         [XmlAttribute("Bot")]
+        [DataMember]
         public int BotShift;
 
         #endregion

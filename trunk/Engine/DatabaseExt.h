@@ -19,7 +19,8 @@ namespace Zamboch
 			public ref class DatabaseExt : public DatabaseManager
 			{
 			public:
-				DatabaseExt()
+				DatabaseExt(String^ PathToDatabase)
+					: DatabaseManager(PathToDatabase)
 				{
 					mappedFactory=false;
 				}
@@ -29,7 +30,7 @@ namespace Zamboch
 					DatabaseExt^ manager;
 					if (DatabaseManager::instance==nullptr)
 					{
-						manager = gcnew DatabaseExt();
+						manager = gcnew DatabaseExt("D:\\Cube21");
 						manager->Initialize();
 					}
 					else

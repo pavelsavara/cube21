@@ -45,9 +45,7 @@ namespace Zamboch.Cube21.Work
                 AssignShapeIds();
                 Database.normalShapes.Sort();
                 SearchForSteps();
-                Database.Save();
             }
-            Database.DumpShapes();
         }
 
 

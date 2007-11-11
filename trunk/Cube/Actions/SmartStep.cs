@@ -5,18 +5,23 @@
 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 namespace Zamboch.Cube21.Actions
 {
+    [DataContract]
     public class SmartStep : IAction
     {
         #region Data
 
         [XmlAttribute("Target")]
+        [DataMember]
         public int TargetShapeIndex;
 
+        [DataMember]
         public Step Step;
+        [DataMember]
         public Correction Correction;
 
         #endregion

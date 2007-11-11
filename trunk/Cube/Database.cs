@@ -94,10 +94,7 @@ namespace Zamboch.Cube21
         {
             if (IsExplored)
             {
-                foreach (NormalShape normalShape in normalShapes)
-                {
-                    normalShape.Pages = new List<Page>();
-                }
+                DatabaseManager.CloseAll();
             }
             string workDir = System.IO.Path.GetDirectoryName(databaseFile);
             if (!Directory.Exists(workDir))
@@ -111,6 +108,14 @@ namespace Zamboch.Cube21
 
         public static Database Load(bool register)
         {
+            if (register)
+            {
+                white = new Cube();
+                whiteShape = null;
+                shapeNormalizer = new Dictionary<uint, Shape>();
+                shapeIndexes = new Dictionary<int, Shape>();
+                halfShapeNormalizer = new Dictionary<uint, HalfShape>();
+            }
             using (StreamReader sr = new StreamReader(databaseFile))
             {
                 Database ins = (Database)databaseSerializer.Deserialize(sr);

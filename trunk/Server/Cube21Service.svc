@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="Server.Cube21Service" CodeBehind="Cube21Service.svc.cs" %>

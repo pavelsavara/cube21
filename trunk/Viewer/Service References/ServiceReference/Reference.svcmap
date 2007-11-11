@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="719602c7-6c19-47a1-ae6d-c4ff54a9ed4c" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:52390/Cube21Service.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="Cube21Service.xsd" MetadataType="Schema" ID="bc8d7018-1f24-4e5e-9574-7e0d4e17153b" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?xsd=xsd3" />
+    <MetadataFile FileName="Cube21Service.wsdl" MetadataType="Wsdl" ID="2728e7bc-c6c3-4e8b-87d5-c0b5c0ce0493" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?wsdl" />
+    <MetadataFile FileName="Cube21Service.disco" MetadataType="Disco" ID="c119068e-e42f-404b-82f3-248d35a1c091" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?disco" />
+    <MetadataFile FileName="Cube21Service1.xsd" MetadataType="Schema" ID="380f2359-669e-42a0-99d0-5e639cf729ff" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?xsd=xsd0" />
+    <MetadataFile FileName="Cube21Service2.xsd" MetadataType="Schema" ID="6532fb56-644b-4fa2-a5b3-072b3c37b502" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?xsd=xsd1" />
+    <MetadataFile FileName="Cube21Service3.xsd" MetadataType="Schema" ID="afdeda5a-3ceb-47dd-88bf-df3fe209cb3a" SourceId="1" SourceUrl="http://localhost:52390/Cube21Service.svc?xsd=xsd2" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
