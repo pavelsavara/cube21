@@ -109,11 +109,22 @@ namespace Zamboch.Cube21.Work
         {
             foreach (NormalShape shape in Database.NormalShapes)
             {
-                ShapeLoader loader = GetShapeLoader(shape.ShapeIndex);
-                loader.Close();
-                shape.Loader = null;
-                shape.Pages=new List<Page>();
+                foreach (Page page in shape.Pages)
+                {
+                    page.Loader = null;
+                }
+                shape.Pages = new List<Page>();
+                shape.SmallIndexToPages = new Dictionary<int, Page>();
+                ShapeLoader loader = shape.Loader;
+                if (loader != null)
+                {
+                    if (loader.IsUsed)
+                        throw new InvalidProgramException();
+                    loader.Close();
+                    shape.Loader = null;
+                }
             }
+            GC.Collect();
         }
 
         #endregion
