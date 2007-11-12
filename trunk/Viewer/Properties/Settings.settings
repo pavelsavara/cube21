@@ -6,7 +6,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="WebService" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://cube21.no-ip.org:8088/Cube21Service.svc</Value>
+      <Value Profile="(Default)">http://cube21.no-ip.org:8088/Cube21Service/Cube21Service.svc</Value>
     </Setting>
     <Setting Name="DatabasePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\Cube21</Value>

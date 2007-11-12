@@ -133,6 +133,7 @@ namespace Viewer
         private void mnuConnect_Click(object sender, RoutedEventArgs e)
         {
             Settings.Default.UseLocal = !Settings.Default.UseLocal;
+            Settings.Default.Save();
             UpdateMenu();
         }
 
@@ -149,9 +150,11 @@ namespace Viewer
             if (Settings.Default.LocalReady)
             {
                 mnuGenerate.Visibility = Visibility.Collapsed;
+                mnuConnect.Visibility = Visibility.Visible;
             }
             else
             {
+                mnuGenerate.Visibility = Visibility.Visible;
                 mnuConnect.Visibility = Visibility.Collapsed;
             }
         }
@@ -214,6 +217,8 @@ namespace Viewer
             {
                 AllocConsole();
                 DatabaseExt.Instance.IsMapped = true;
+                Cube c=new Cube();
+                c.ReadLevel();
                 if (DatabaseManager.instance.Explore())
                 {
                     DatabaseManager.CloseAll();
@@ -242,17 +247,11 @@ namespace Viewer
                 if (d.IsExplored)
                 {
                     Settings.Default.LocalReady = true;
+                    Settings.Default.UseLocal = true;
                     Settings.Default.Save();
                 }
-                else
-                {
-                    mnuGenerate.Visibility = System.Windows.Visibility.Visible;
-                }
             }
-            else
-            {
-                mnuGenerate.Visibility = System.Windows.Visibility.Visible;
-            }
+            UpdateMenu();
         }
 
         private void buttonRandomStep_Click(object sender, RoutedEventArgs e)
