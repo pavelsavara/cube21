@@ -37,7 +37,7 @@ namespace Viewer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://cube21.no-ip.org:8088/Cube21Service/Cube21Service.svc/bas")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://cube21.no-ip.org/Cube21/Cube21Service/Cube21Service.svc/bas")]
         public string WebService {
             get {
                 return ((string)(this["WebService"]));
