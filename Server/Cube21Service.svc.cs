@@ -12,17 +12,6 @@ namespace Server
 {
     public class Cube21Service : ICube21Service
     {
-        static Cube21Service()
-        {
-            if (manager == null)
-            {
-                manager = new DatabaseManager(Settings.Default.DatabasePath);
-                manager.Initialize();
-            }
-        }
-
-        private static DatabaseManager manager;
-
         public Path FindWayHome(Cube cube)
         {
             try
