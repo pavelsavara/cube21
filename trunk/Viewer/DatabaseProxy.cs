@@ -25,20 +25,12 @@ namespace Viewer
             {
                 try
                 {
-                    //WSHttpBinding binding = new WSHttpBinding("WSHttpBinding_ICube21Service");
-                    //EndpointAddress a = new EndpointAddress("http://localhost:8088/Cube21Service.svc");
-                    //EndpointAddress a = new EndpointAddress("http://localhost:52390/Cube21Service.svc");
-                    
-                    EndpointAddress a = new EndpointAddress("http://localhost:8088/Cube21Service/Cube21Service.svc/bas");
-                
-
-
                     BasicHttpBinding binding = new BasicHttpBinding();
                     binding.Name = "binding1";
                     binding.HostNameComparisonMode = HostNameComparisonMode.StrongWildcard;
                     binding.Security.Mode = BasicHttpSecurityMode.None;
 
-                    //EndpointAddress a = new EndpointAddress(Settings.Default.WebService);
+                    EndpointAddress a = new EndpointAddress(Settings.Default.WebService);
                     Cube21ServiceClient client = new Cube21ServiceClient(binding, a);
                     SmartStep[] result = client.FindWayHome(cube);
                     client.Close();
