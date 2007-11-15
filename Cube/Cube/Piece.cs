@@ -68,23 +68,23 @@ namespace Zamboch.Cube21
 
     public enum PieceChar
     {
-        STS0 = '0',
-        BTSS = '1',
-        STS1 = '2',
-        BTSY = '3',
-        STY0 = '4',
-        BTYY = '5',
-        STY1 = '6',
-        BTYS = '7',
+        STS0 = '0', //0000   Silver Top, Silver Side, Small
+        BTSS = '1', //0001   Silver Top, Silver Side1, Silver Side2, Big
+        STS1 = '2', //0010   Silver Top, Silver Side, Small
+        BTSY = '3', //0011   Silver Top, Silver Side1, Yellow Side2, Big
+        STY0 = '4', //0100   Silver Top, Yellow Side, Small
+        BTYY = '5', //0111 !!Silver Top, Yellow Side1, Yellow Side2, Big
+        STY1 = '6', //0110   Silver Top, Yellow Side, Small
+        BTYS = '7', //0101 !!Silver Top, Yellow Side1, Silver Side2, Big
 
-        SBS0 = '8',
-        BBSS = '9',
-        SBS1 = 'A',
-        BBSY = 'B',
-        SBY0 = 'C',
-        BBYY = 'D',
-        SBY1 = 'E',
-        BBYS = 'F',
+        SBS0 = '8', //1000   Yellow Bot, Silver Side, Small
+        BBSS = '9', //1001   Yellow Bot, Silver Side1, Silver Side2, Big
+        SBS1 = 'A', //1010   Yellow Bot, Silver Side, Small
+        BBSY = 'B', //1101 !!Yellow Bot, Yellow Side1, Silver Side2, Big
+        SBY0 = 'C', //1100   Yellow Bot, Yellow Side, Small
+        BBYY = 'D', //1111 !!Yellow Bot, Yellow Side1, Yellow Side2, Big
+        SBY1 = 'E', //1110   Yellow Bot, Yellow Side, Small
+        BBYS = 'F', //1101 !!Yellow Bot, Yellow Side1, Silver Side2, Big
 
         MIDS = 'G',
         MIDY = 'H',
@@ -139,23 +139,23 @@ namespace Zamboch.Cube21
             toChar[0x11] = (PieceChar)'H';
 
             toColor = new byte[18];
-            toColor[0x0] = 0x0;
-            toColor[0x1] = 0x1;
-            toColor[0x2] = 0x2;
-            toColor[0x3] = 0x3;
-            toColor[0x4] = 0x4;
-            toColor[0x5] = 0x7;//
-            toColor[0x6] = 0x6;
-            toColor[0x7] = 0x5;//
-            
-            toColor[0x8] = 0x8;
-            toColor[0x9] = 0x9;
-            toColor[0xA] = 0xA;
-            toColor[0xB] = 0xD;//
-            toColor[0xC] = 0xC;
-            toColor[0xD] = 0xF;//
-            toColor[0xE] = 0xE;
-            toColor[0xF] = 0xB;//
+            toColor[0x0] = 0x0;//0000   Silver Top, Silver Side, Small
+            toColor[0x1] = 0x1;//0001   Silver Top, Silver Side1, Silver Side2, Big
+            toColor[0x2] = 0x2;//0010   Silver Top, Silver Side, Small
+            toColor[0x3] = 0x3;//0011   Silver Top, Silver Side1, Yellow Side2, Big
+            toColor[0x4] = 0x4;//0100   Silver Top, Yellow Side, Small
+            toColor[0x5] = 0x7;//0111 !!Silver Top, Yellow Side1, Yellow Side2, Big
+            toColor[0x6] = 0x6;//0110   Silver Top, Yellow Side, Small
+            toColor[0x7] = 0x5;//0101 !!Silver Top, Yellow Side1, Silver Side2, Big
+
+            toColor[0x8] = 0x8;//1000   Yellow Bot, Silver Side, Small
+            toColor[0x9] = 0x9;//1001   Yellow Bot, Silver Side1, Silver Side2, Big
+            toColor[0xA] = 0xA;//1010   Yellow Bot, Silver Side, Small
+            toColor[0xB] = 0xD;//1101 !!Yellow Bot, Yellow Side1, Silver Side2, Big
+            toColor[0xC] = 0xC;//1100   Yellow Bot, Yellow Side, Small
+            toColor[0xD] = 0xF;//1111 !!Yellow Bot, Yellow Side1, Yellow Side2, Big
+            toColor[0xE] = 0xE;//1110   Yellow Bot, Yellow Side, Small
+            toColor[0xF] = 0xB;//1101 !!Yellow Bot, Yellow Side1, Silver Side2, Big
 
             toColor[0x10] = 0x10;
             toColor[0x11] = 0x11;
