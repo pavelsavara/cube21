@@ -675,6 +675,36 @@ namespace Zamboch.Cube21
             return true;
         }
 
+        public bool EqualsSmallWise(Cube o)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                if (PieceHelper.IsSmall(top[i]))
+                {
+                    if (((int)top[i] & 0xD) != ((int)o.top[i] & 0xD))
+                        return false;
+                }
+                else
+                {
+                    if (top[i] != o.top[i])
+                        return false;
+                }
+
+
+                if (PieceHelper.IsSmall(bot[i]))
+                {
+                    if (((int)bot[i] & 0xD) != ((int)o.bot[i] & 0xD))
+                        return false;
+                }
+                else
+                {
+                    if (bot[i] != o.bot[i])
+                        return false;
+                }
+            }
+            return true;
+        }
+
         [XmlAttribute("Perm")]
         [DataMember]
         public string CubePermutation
@@ -771,7 +801,7 @@ namespace Zamboch.Cube21
         {
             Cube temp=new Cube(this);
             Path path=new Path(temp);
-            while (!temp.Equals(Database.white))
+            while (!temp.EqualsSmallWise(Database.white))
             {
                 SmartStep step = temp.FindStepHome();
                 if (step == null)
@@ -779,15 +809,15 @@ namespace Zamboch.Cube21
                 path.Add(step);
                 step.DoAction(temp);
             }
-            int t = temp.PositionOf(Piece.STS0_0);
-            int b = temp.PositionOf(Piece.SBS0_8)-12;
+            int t = temp.PositionOf(Piece.BTSS_1) - 1;
+            int b = temp.PositionOf(Piece.BBSS_9) - 13;
             Correction correction;
             if (t >= 12)
             {
                 Cube flip = new Cube(temp);
                 flip.Flip();
-                t = flip.PositionOf(Piece.STS0_0);
-                b = flip.PositionOf(Piece.SBS0_8) - 12;
+                t = flip.PositionOf(Piece.BTSS_1) - 1;
+                b = flip.PositionOf(Piece.BBSS_9) - 13;
                 correction = new Correction((24 - t) % 12, (24 - b) % 12);
                 correction.Flip = true;
                 correction.DoAction(temp);
