@@ -1,12 +1,12 @@
 <publishData>
   <publishTarget publishUrl="http://localhost/Cube21/Cube21Service/">
     <file relUrl="Global.asax" publishTime="11/13/2007 00:49:40" />
-    <file relUrl="bin/Server.dll" publishTime="11/13/2007 03:42:05" />
-    <file relUrl="bin/Cube.dll" publishTime="11/13/2007 03:42:04" />
-    <file relUrl="Cube21Service.svc" publishTime="11/11/2007 13:09:16" />
+    <file relUrl="bin/Server.dll" publishTime="11/18/2007 08:38:43" />
+    <file relUrl="bin/Cube.dll" publishTime="11/18/2007 08:34:25" />
+    <file relUrl="bin/Cube.pdb" publishTime="11/18/2007 08:34:25" />
     <file relUrl="Web.config" publishTime="11/13/2007 03:41:54" />
-    <file relUrl="bin/Server.pdb" publishTime="11/13/2007 03:42:05" />
-    <file relUrl="bin/Cube.pdb" publishTime="11/13/2007 03:42:04" />
+    <file relUrl="bin/Server.pdb" publishTime="11/18/2007 08:38:43" />
+    <file relUrl="Cube21Service.svc" publishTime="11/11/2007 13:09:16" />
     <file relUrl="BestPath.aspx" publishTime="11/13/2007 00:28:29" />
   </publishTarget>
   <publishTarget publishUrl="http://localhost:8088/Cube21Service/">

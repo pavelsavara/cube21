@@ -42,7 +42,8 @@ namespace Server
             }
             catch(Exception ex)
             {
-                lbResult.Text = "Bad cube permutation" + ex;
+                string s = "Bad cube permutation \n\n" + ex;
+                lbResult.Text = s.Replace("\n", "<br/>");
             }
         }
     }
